@@ -1016,7 +1016,14 @@
      *   appId: "1:1234567890:web:abcdef"
      * };
      * ========================================================================= */
-    const DEFAULT_FIREBASE_CONFIG = null;
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSy...",
+  authDomain: "kitchensync-xxxx.firebaseapp.com",
+  projectId: "kitchensync-xxxx",
+  storageBucket: "kitchensync-xxxx.firebasestorage.app",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef"
+};
 
     const FB_CONFIG_STORAGE_KEY = 'kitchensync_firebase_config';
     const HOUSEHOLD_CODE_STORAGE_KEY = 'kitchensync_household_code';
