@@ -93,6 +93,10 @@
       color-scheme: dark;
     }
 
+    html, body {
+      overflow-x: clip;
+    }
+
     body {
       background-color: var(--bg-app);
       color: var(--text-primary);
@@ -115,34 +119,34 @@
   <div id="toast-container" class="fixed bottom-5 right-4 left-4 md:left-auto md:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- ===================================================================== -->
-  <!-- TWO-ROW STICKY TOP HEADER (ZERO-OVERLAP RESPONSIVE LAYOUT)            -->
+  <!-- TWO-ROW STICKY TOP HEADER (COMPACT TRAY + 4-COLUMN TAB TILES)         -->
   <!-- ===================================================================== -->
-  <header style="background-color: var(--bg-header); border-color: var(--border-subtle);" class="sticky top-0 z-30 backdrop-blur-md border-b transition-colors">
-    <!-- Row 1: Brand Emblem/Wordmark (Left) + Theme, Install & Cloud Sync Controls (Right) -->
-    <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2">
-      <!-- Left: KitchenSync SVG Emblem + Wordmark (shrink-0 prevents overlap at any width) -->
-      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
-        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
+  <header style="background-color: var(--bg-header); border-color: var(--border-subtle);" class="sticky top-0 z-30 w-full backdrop-blur-md border-b transition-colors">
+    <!-- Row 1: Compact Brand Mark (Left) + Theme, Install & Cloud Sync Controls (Right) -->
+    <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2 flex items-center justify-between gap-1.5 sm:gap-3 min-w-0">
+      <!-- Left: KitchenSync SVG Emblem + Wordmark -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
           <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M7 3v6a2 2 0 002 2h0a2 2 0 002-2V3M9 3v18" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7l3-3 3 3M19 4v9a4 4 0 01-4 4h-2" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 2 2 2" />
           </svg>
         </div>
-        <span style="color: var(--text-primary);" class="font-extrabold text-sm min-[380px]:text-base sm:text-lg tracking-tight leading-none whitespace-nowrap">
+        <span style="color: var(--text-primary);" class="font-extrabold text-sm sm:text-lg tracking-tight leading-none whitespace-nowrap">
           KitchenSync
         </span>
       </div>
 
-      <!-- Right: Icon-Only 3-Way Theme Pill + PWA Install Button + Cloud Sync Status Pill -->
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- Right: Compact 3-Way Theme Pill + PWA Install Button + Cloud Sync Status Pill -->
+      <div class="flex items-center gap-1 sm:gap-2 min-w-0 shrink">
         <!-- Compact Icon-Only 3-Way Theme Toggle Pill -->
         <div
           id="theme-switcher"
           role="radiogroup"
           aria-label="Theme selector"
           style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);"
-          class="inline-flex items-center p-0.5 sm:p-1 rounded-xl border shrink-0"
+          class="inline-flex items-center p-0.5 rounded-xl border shrink-0"
         >
           <button
             type="button"
@@ -152,7 +156,7 @@
             onclick="setThemeMode('light')"
             title="Light theme"
             aria-label="Light theme"
-            class="theme-btn p-1.5 rounded-lg transition flex items-center justify-center"
+            class="theme-btn p-1 sm:p-1.5 rounded-lg transition flex items-center justify-center"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="4" />
@@ -168,7 +172,7 @@
             onclick="setThemeMode('dark')"
             title="Dark theme"
             aria-label="Dark theme"
-            class="theme-btn p-1.5 rounded-lg transition flex items-center justify-center"
+            class="theme-btn p-1 sm:p-1.5 rounded-lg transition flex items-center justify-center"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
@@ -183,7 +187,7 @@
             onclick="setThemeMode('system')"
             title="System theme (Auto)"
             aria-label="System theme"
-            class="theme-btn p-1.5 rounded-lg transition flex items-center justify-center"
+            class="theme-btn p-1 sm:p-1.5 rounded-lg transition flex items-center justify-center"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <rect x="2" y="3" width="20" height="14" rx="2" />
@@ -192,73 +196,84 @@
           </button>
         </div>
 
-        <!-- PWA Install Button (Auto-hides when running in standalone PWA mode) -->
+        <!-- PWA Install Button (Icon-only on mobile, labeled on desktop, auto-hides when installed) -->
         <button
           type="button"
           id="header-install-btn"
           onclick="handleInstallButtonClick()"
           style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);"
-          class="p-1.5 min-[420px]:px-2.5 min-[420px]:py-1.5 rounded-xl border hover:border-emerald-500/50 text-xs font-bold flex items-center gap-1.5 transition shrink-0"
+          class="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border hover:border-emerald-500/50 text-xs font-bold flex items-center gap-1.5 transition shrink-0"
           title="Install KitchenSync App"
           aria-label="Install KitchenSync App"
         >
           <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          <span class="hidden min-[420px]:inline">Install</span>
+          <span class="hidden sm:inline">Install</span>
         </button>
 
-        <!-- Live Cloud Sync Status / Sign-In Pill -->
+        <!-- Live Cloud Sync Status / Sign-In Pill (Compact label on mobile, full label on desktop) -->
         <button
           id="cloud-sync-pill"
           onclick="openCloudSyncModal()"
           style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary);"
-          class="px-2 sm:px-3 py-1.5 rounded-xl hover:border-indigo-500/50 border text-xs font-semibold flex items-center gap-1.5 sm:gap-2 transition shrink-0 max-w-[88px] min-[380px]:max-w-[130px] sm:max-w-[200px]"
+          class="px-2 sm:px-3 py-1.5 rounded-xl hover:border-indigo-500/50 border text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 min-w-0 max-w-[92px] sm:max-w-[200px] transition"
           title="Configure Firebase Authentication & Household Cloud Sync"
         >
           <span id="cloud-sync-dot-wrapper" class="relative flex h-2 w-2 shrink-0">
             <span id="cloud-sync-dot" class="relative inline-flex rounded-full h-2 w-2 bg-slate-400"></span>
           </span>
-          <span id="cloud-sync-label" class="truncate">Local Only</span>
+          <span id="cloud-sync-label-mobile" class="sm:hidden truncate">Local</span>
+          <span id="cloud-sync-label" class="hidden sm:inline truncate">Local Only</span>
         </button>
       </div>
     </div>
 
-    <!-- Row 2: Dedicated Full-Width Navigation Sub-Row (Scrollable on 320px+, Zero Overlap) -->
+    <!-- Row 2: 4-Column Stacked Navigation Tiles (All 4 tabs visible at once, zero horizontal swipe) -->
     <div style="border-color: var(--border-subtle);" class="border-t">
       <nav
         aria-label="Primary Navigation"
-        class="max-w-6xl mx-auto px-3 sm:px-6 py-1.5 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar"
+        class="max-w-6xl mx-auto px-3 sm:px-6 py-2 grid grid-cols-4 gap-1.5 sm:gap-2"
       >
-        <button onclick="switchTab('grocery')" data-tab="grocery" class="nav-tab-btn px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <span>Grocery List</span>
-          <span id="badge-grocery" class="text-[11px] px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold">0</span>
+        <button onclick="switchTab('grocery')" data-tab="grocery" class="nav-tab-btn px-1 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-sm font-bold border border-transparent transition flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 min-w-0">
+          <div class="flex items-center justify-center gap-1">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span id="badge-grocery" class="text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-extrabold leading-tight">0</span>
+          </div>
+          <span class="sm:hidden truncate leading-tight">Grocery</span>
+          <span class="hidden sm:inline truncate">Grocery List</span>
         </button>
 
-        <button onclick="switchTab('recipes')" data-tab="recipes" class="nav-tab-btn px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-          <span>Recipes</span>
-          <span id="badge-recipes" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="text-[11px] px-1.5 py-0.2 rounded-md font-semibold">4</span>
+        <button onclick="switchTab('recipes')" data-tab="recipes" class="nav-tab-btn px-1 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-sm font-bold border border-transparent transition flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 min-w-0">
+          <div class="flex items-center justify-center gap-1">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span id="badge-recipes" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-md font-bold leading-tight">4</span>
+          </div>
+          <span class="truncate leading-tight">Recipes</span>
         </button>
 
-        <button onclick="switchTab('planner')" data-tab="planner" class="nav-tab-btn px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <span>Meal Planner</span>
+        <button onclick="switchTab('planner')" data-tab="planner" class="nav-tab-btn px-1 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-sm font-bold border border-transparent transition flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 min-w-0">
+          <div class="flex items-center justify-center gap-1">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span class="sm:hidden truncate leading-tight">Planner</span>
+          <span class="hidden sm:inline truncate">Meal Planner</span>
         </button>
 
-        <button onclick="switchTab('pantry')" data-tab="pantry" class="nav-tab-btn px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-          <span>Pantry</span>
-          <span id="badge-pantry" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="text-[11px] px-1.5 py-0.2 rounded-md font-semibold">0</span>
+        <button onclick="switchTab('pantry')" data-tab="pantry" class="nav-tab-btn px-1 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-sm font-bold border border-transparent transition flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 min-w-0">
+          <div class="flex items-center justify-center gap-1">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span id="badge-pantry" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-md font-bold leading-tight">0</span>
+          </div>
+          <span class="truncate leading-tight">Pantry</span>
         </button>
       </nav>
     </div>
@@ -471,22 +486,22 @@
       </div>
 
       <!-- Add Staple & Search Bar -->
-      <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="p-4 rounded-2xl border grid grid-cols-1 md:grid-cols-2 gap-3">
-        <form onsubmit="handleAddPantryItem(event)" class="flex gap-2">
+      <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="p-4 rounded-2xl border grid grid-cols-1 md:grid-cols-2 gap-3 overflow-hidden">
+        <form onsubmit="handleAddPantryItem(event)" class="flex items-center gap-2 min-w-0 w-full">
           <input
             type="text"
             id="pantry-add-input"
             style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);"
-            placeholder="Add staple to pantry (e.g. Coconut Milk, Paprika)..."
-            class="flex-1 px-3.5 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
+            placeholder="Add staple (e.g. Coconut Milk, Paprika)..."
+            class="flex-1 min-w-0 w-full px-3.5 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
             required
           />
-          <button type="submit" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-sm transition shrink-0">
+          <button type="submit" class="px-3.5 sm:px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-sm transition shrink-0 whitespace-nowrap">
             Add Staple
           </button>
         </form>
 
-        <div class="relative">
+        <div class="relative min-w-0 w-full">
           <svg style="color: var(--text-muted);" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -496,7 +511,7 @@
             oninput="renderPantry()"
             style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);"
             placeholder="Filter pantry items..."
-            class="w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
+            class="w-full min-w-0 pl-10 pr-4 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
           />
         </div>
       </div>
@@ -1972,6 +1987,7 @@
     function updateCloudSyncUI() {
       const dot = document.getElementById('cloud-sync-dot');
       const label = document.getElementById('cloud-sync-label');
+      const labelMobile = document.getElementById('cloud-sync-label-mobile');
       const modalDot = document.getElementById('modal-sync-indicator');
       const cfgStatus = document.getElementById('fb-config-status-text');
       const clearCfgBtn = document.getElementById('btn-clear-fb-config');
@@ -2021,12 +2037,14 @@
           if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-emerald-500';
           if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
           if (label) label.textContent = `Live • ${cloud.householdCode}`;
+          if (labelMobile) labelMobile.textContent = cloud.householdCode;
           hhStatus?.classList.remove('hidden');
           if (hhStatusText) hhStatusText.textContent = `Syncing Shared Household room "${cloud.householdCode}" live`;
         } else {
           if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-indigo-500';
           if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-indigo-500';
           if (label) label.textContent = 'Personal Synced';
+          if (labelMobile) labelMobile.textContent = 'Synced';
           hhStatus?.classList.add('hidden');
         }
       } else {
@@ -2039,11 +2057,13 @@
           if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-500';
           if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
           if (label) label.textContent = 'Sign In to Sync';
+          if (labelMobile) labelMobile.textContent = 'Sign In';
           if (authHint) authHint.textContent = 'Choose a sign-in method';
         } else {
           if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-slate-400';
           if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400';
           if (label) label.textContent = 'Local Only';
+          if (labelMobile) labelMobile.textContent = 'Local';
           if (authHint) authHint.textContent = 'Connect Firebase above first';
         }
       }
