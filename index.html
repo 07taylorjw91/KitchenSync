@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" id="meta-theme-color" content="#020617" />
-  <meta name="description" content="KitchenSync — Recipes, Meal Plan & Smart Grocery Lists" />
-  <title>KitchenSync — Recipes, Meal Plan & Smart Grocery Lists</title>
+  <meta name="description" content="KitchenSync — Recipes, Meal Plan & Smart Grocery List" />
+  <title>KitchenSync — Recipes, Meal Plan & Smart Grocery List</title>
 
   <!-- Dynamic Blob PWA Manifest attached & updated by ThemeManager -->
   <link rel="manifest" id="pwa-manifest" />
@@ -114,21 +114,18 @@
       <!-- Brand Identity -->
       <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
-          <!-- Custom Inline SVG KitchenSync Logo -->
+          <!-- Custom Inline SVG KitchenSync Fork/Sync Logo -->
           <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M6 6v10a4 4 0 004 4h4a4 4 0 004-4V6" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 11l2 2 4-4" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 3v6a2 2 0 002 2h0a2 2 0 002-2V3M9 3v18" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7l3-3 3 3M19 4v9a4 4 0 01-4 4h-2" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 2 2 2" />
           </svg>
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-2">
             <h1 style="color: var(--text-primary);" class="font-extrabold text-base sm:text-lg tracking-tight leading-none">KitchenSync</h1>
-            <span style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="hidden lg:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 border">
-              Multi-List
-            </span>
           </div>
-          <p style="color: var(--text-muted);" class="hidden sm:block text-xs truncate mt-0.5">Recipes, Meal Plan & Smart Grocery Lists</p>
+          <p style="color: var(--text-muted);" class="hidden sm:block text-xs truncate mt-0.5">Recipes, Meal Plan & Smart Grocery List</p>
         </div>
       </div>
 
@@ -151,7 +148,7 @@
         </button>
       </nav>
 
-      <!-- Right Controls: 3-Way Theme Switcher + Household Sync -->
+      <!-- Right Controls: 3-Way Theme Switcher + Live Cloud Sync Pill -->
       <div class="flex items-center gap-2 shrink-0">
         <!-- 3-Way Segmented Theme Selector (Light / Dark / System) -->
         <div
@@ -215,18 +212,18 @@
           </button>
         </div>
 
-        <!-- Household Sync Status Badge -->
+        <!-- Live Cloud Sync Status Pill -->
         <button
-          onclick="openModal('sync-modal')"
+          id="cloud-sync-pill"
+          onclick="openCloudSyncModal()"
           style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary);"
-          class="px-3 py-2 rounded-xl hover:border-indigo-500/50 border text-xs font-semibold flex items-center gap-2 transition shrink-0"
-          title="View Firestore Multi-List Sync Architecture"
+          class="px-3 py-2 rounded-xl hover:border-indigo-500/50 border text-xs font-semibold flex items-center gap-2 transition shrink-0 max-w-[165px] sm:max-w-[220px]"
+          title="Configure Firebase Authentication & Household Cloud Sync"
         >
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+          <span id="cloud-sync-dot-wrapper" class="relative flex h-2 w-2 shrink-0">
+            <span id="cloud-sync-dot" class="relative inline-flex rounded-full h-2 w-2 bg-slate-400"></span>
           </span>
-          <span class="hidden sm:inline">Sync</span>
+          <span id="cloud-sync-label" class="truncate">Local Only</span>
         </button>
       </div>
     </div>
@@ -823,53 +820,142 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- MODAL 6: HOUSEHOLD SYNC & FIRESTORE ARCHITECTURE INFO                 -->
+  <!-- MODAL 6: CLOUD SYNC, FIREBASE AUTH & HOUSEHOLD ROOM CODE              -->
   <!-- ===================================================================== -->
-  <div id="sync-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-4">
-    <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-xl mx-auto rounded-3xl border shadow-2xl overflow-hidden my-6">
+  <div id="sync-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-3 sm:p-5">
+    <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-xl mx-auto rounded-3xl border shadow-2xl overflow-hidden my-4">
       <div style="border-color: var(--border-subtle);" class="px-6 py-4 border-b flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-          <h3 style="color: var(--text-primary);" class="text-lg font-bold">Household Sync & Firestore Model</h3>
+          <span id="modal-sync-indicator" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+          <h3 style="color: var(--text-primary);" class="text-lg font-bold">Cloud Sync & Household</h3>
         </div>
         <button onclick="closeModal('sync-modal')" style="color: var(--text-muted);" class="p-2 rounded-xl hover:bg-slate-500/10">✕</button>
       </div>
 
       <div style="color: var(--text-secondary);" class="p-6 space-y-5 text-xs">
-        <p style="color: var(--text-muted);" class="leading-relaxed">
-          KitchenSync separates private solo lists from real-time shared flatmate lists using dual Firestore collection paths, currently persisted locally in <code class="text-emerald-600 dark:text-emerald-400 font-mono">kitchensync_*</code> keys:
-        </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div style="background-color: var(--bg-surface-elevated);" class="p-3.5 rounded-2xl border border-emerald-500/35 space-y-1.5">
-            <div class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-              <span>●</span> Personal Lists Path
+        <!-- STEP 1: FIREBASE PROJECT CONFIG STATUS / RUNTIME PASTE -->
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-4 rounded-2xl border space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">1. Firebase Project</span>
+              <span id="fb-config-status-text" style="color: var(--text-primary);" class="font-bold">Not Configured</span>
             </div>
-            <code style="background-color: var(--bg-surface); color: var(--text-primary);" class="block text-[11px] font-mono px-2 py-1 rounded-lg">
-              users/{uid}/lists/{listId}
-            </code>
-            <p style="color: var(--text-muted);" class="text-[11px]">Private security rules: only readable and writable by your Firebase Auth UID.</p>
+            <button type="button" id="btn-toggle-config-editor" onclick="toggleFirebaseConfigEditor()" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+              Configure / Edit
+            </button>
           </div>
 
-          <div style="background-color: var(--bg-surface-elevated);" class="p-3.5 rounded-2xl border border-indigo-500/35 space-y-1.5">
-            <div class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-              <span>●</span> Shared Household Path
+          <div id="fb-config-editor-box" class="space-y-2.5">
+            <p style="color: var(--text-muted);" class="text-[11px] leading-relaxed">
+              Paste your <code class="text-emerald-600 dark:text-emerald-400 font-mono">firebaseConfig</code> object (either raw JS snippet from Firebase Console or JSON) to connect immediately:
+            </p>
+            <textarea
+              id="fb-config-textarea"
+              rows="4"
+              style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);"
+              placeholder='const firebaseConfig = {&#10;  apiKey: "AIzaSy...",&#10;  authDomain: "your-app.firebaseapp.com",&#10;  projectId: "your-app"&#10;};'
+              class="w-full p-3 rounded-xl border font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            ></textarea>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <button type="button" id="btn-clear-fb-config" onclick="clearSavedFirebaseConfig()" class="hidden px-3 py-1.5 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold hover:bg-rose-500/10">
+                Disconnect Config
+              </button>
+              <button type="button" onclick="saveRuntimeFirebaseConfig()" class="ml-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition">
+                Save & Connect Firebase
+              </button>
             </div>
-            <code style="background-color: var(--bg-surface); color: var(--text-primary);" class="block text-[11px] font-mono px-2 py-1 rounded-lg">
-              households/{id}/lists/{listId}
-            </code>
-            <p style="color: var(--text-muted);" class="text-[11px]">Real-time <code class="text-indigo-600 dark:text-indigo-300">onSnapshot</code> sync across all housemates in the household.</p>
           </div>
         </div>
 
-        <!-- Simulated Housemate Invite Link -->
-        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-4 rounded-2xl border space-y-2">
-          <div style="color: var(--text-primary);" class="font-bold">Housemate Invite Code (Preview)</div>
-          <div class="flex items-center gap-2">
-            <input type="text" readonly value="https://kitchensync.web.app/join/FLAT-4B-SYNC" id="invite-link-input" style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="flex-1 px-3 py-2 rounded-xl border font-mono text-[11px] text-indigo-600 dark:text-indigo-300" />
-            <button type="button" onclick="copyInviteLink()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shrink-0">
-              Copy Invite
+        <!-- STEP 2: SIGN-IN PROVIDERS (GITHUB, GOOGLE, ANONYMOUS GUEST) -->
+        <div id="fb-auth-section" style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-4 rounded-2xl border space-y-3 opacity-60 pointer-events-none transition">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">2. Account Sign-In</span>
+            <span id="fb-auth-hint" style="color: var(--text-muted);" class="text-[11px]">Connect Firebase above first</span>
+          </div>
+
+          <!-- Signed-Out Buttons -->
+          <div id="fb-signed-out-controls" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button type="button" onclick="signInWithGithub()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 text-white border border-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              <span>GitHub</span>
             </button>
+
+            <button type="button" onclick="signInWithGoogle()" style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);" class="px-3.5 py-2.5 rounded-xl border hover:border-indigo-500/50 font-bold text-xs flex items-center justify-center gap-2 transition">
+              <svg class="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24z" />
+                <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14z" />
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96z" />
+              </svg>
+              <span>Google</span>
+            </button>
+
+            <button type="button" onclick="signInAsGuest()" style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);" class="px-3.5 py-2.5 rounded-xl border hover:border-emerald-500/50 font-bold text-xs flex items-center justify-center gap-2 transition">
+              <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Guest (No Account)</span>
+            </button>
+          </div>
+
+          <!-- Signed-In User Card -->
+          <div id="fb-signed-in-card" style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="hidden p-3.5 rounded-xl border flex flex-wrap items-center justify-between gap-3">
+            <div class="space-y-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="fb-user-display-name" style="color: var(--text-primary);" class="font-bold text-xs truncate">Signed In</span>
+                <span id="fb-user-provider-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                  Provider
+                </span>
+              </div>
+              <div style="color: var(--text-muted);" class="font-mono text-[10px]">
+                UID: <span id="fb-user-uid">...</span> • Private data synced to <code class="text-emerald-600 dark:text-emerald-400">users/{uid}</code>
+              </div>
+            </div>
+
+            <button type="button" onclick="signOutFirebase()" class="px-3 py-1.5 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-bold text-xs shrink-0">
+              Sign Out
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: SHARED HOUSEHOLD ROOM CODE -->
+        <div id="fb-household-section" style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-4 rounded-2xl border space-y-3 opacity-60 pointer-events-none transition">
+          <div class="flex items-center justify-between gap-2">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">3. Shared Household Room</span>
+            <button type="button" onclick="generateRandomHouseholdCode()" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+              Generate Code
+            </button>
+          </div>
+
+          <p style="color: var(--text-muted);" class="text-[11px] leading-relaxed">
+            Anyone signed in (even as Guest) who enters the same Household Code syncs the <strong>Shared Household</strong> grocery list in real time. Your <strong>Personal</strong> list stays private.
+          </p>
+
+          <form onsubmit="handleSaveHouseholdCode(event)" class="flex flex-col sm:flex-row gap-2">
+            <input
+              type="text"
+              id="household-code-input"
+              style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);"
+              placeholder="e.g. flat-42-basil"
+              class="flex-1 px-3.5 py-2 rounded-xl border font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            />
+            <div class="flex items-center gap-2">
+              <button type="submit" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shrink-0 transition">
+                Join / Sync Room
+              </button>
+              <button type="button" onclick="copyInviteLink()" style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);" class="px-3 py-2 rounded-xl border hover:border-indigo-500/40 font-bold text-xs shrink-0" title="Copy direct invite link with room code">
+                Copy Invite Link
+              </button>
+            </div>
+          </form>
+
+          <div id="active-household-status" class="hidden text-[11px] font-semibold text-indigo-600 dark:text-indigo-300 flex items-center gap-1.5">
+            <span>●</span>
+            <span id="active-household-status-text">Syncing Shared Household list live</span>
           </div>
         </div>
 
@@ -891,16 +977,57 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- JAVASCRIPT APPLICATION: THEME ENGINE + FIRESTORE-READY MULTI-LIST     -->
+  <!-- ES MODULE: THEME ENGINE, KITCHENSYNC APP & FIREBASE LIVE CLOUD SYNC   -->
   <!-- ===================================================================== -->
-  <script>
+  <script type="module">
+    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import {
+      getAuth,
+      GithubAuthProvider,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
+      signInAnonymously,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+    /* =========================================================================
+     * 0. FIREBASE CONFIGURATION (PRE-CONFIG IN CODE OR RUNTIME IN MODAL)
+     *
+     * Replace `null` below with your Firebase Web App `firebaseConfig` object
+     * so every housemate opening your GitHub Pages link connects automatically:
+     *
+     * const DEFAULT_FIREBASE_CONFIG = {
+     *   apiKey: "AIzaSy...",
+     *   authDomain: "your-project.firebaseapp.com",
+     *   projectId: "your-project",
+     *   storageBucket: "your-project.firebasestorage.app",
+     *   messagingSenderId: "1234567890",
+     *   appId: "1:1234567890:web:abcdef"
+     * };
+     * ========================================================================= */
+    const DEFAULT_FIREBASE_CONFIG = null;
+
+    const FB_CONFIG_STORAGE_KEY = 'kitchensync_firebase_config';
+    const HOUSEHOLD_CODE_STORAGE_KEY = 'kitchensync_household_code';
+
     /**
      * =========================================================================
      * 1. THEME CONTROLLER (LIGHT / DARK / SYSTEM + LIVE OS MATCHMEDIA + PWA)
      * =========================================================================
      */
     const THEME_STORAGE_KEY = 'kitchensync_theme';
-    let currentThemeMode = 'system'; // 'light' | 'dark' | 'system'
+    let currentThemeMode = 'system';
     let activeManifestBlobUrl = null;
     const osDarkMediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
 
@@ -917,15 +1044,12 @@
 
       document.documentElement.classList.toggle('dark', isDark);
 
-      // Update <meta name="theme-color">
       const themeHex = isDark ? '#020617' : '#fafaf9';
       const metaTheme = document.getElementById('meta-theme-color');
       if (metaTheme) metaTheme.setAttribute('content', themeHex);
 
-      // Update dynamic Blob PWA manifest with matching theme/background colors
       updateDynamicPWAManifest(themeHex);
 
-      // Update 3-way segmented control active states & ARIA attributes
       document.querySelectorAll('.theme-btn').forEach(btn => {
         const isSelected = btn.dataset.themeOption === currentThemeMode;
         btn.setAttribute('aria-checked', isSelected ? 'true' : 'false');
@@ -956,12 +1080,9 @@
 
       applyTheme(savedMode);
 
-      // Listen live to OS dark/light preference changes when set to 'system'
       if (osDarkMediaQuery) {
         const onSystemThemeChange = () => {
-          if (currentThemeMode === 'system') {
-            applyTheme('system');
-          }
+          if (currentThemeMode === 'system') applyTheme('system');
         };
         if (typeof osDarkMediaQuery.addEventListener === 'function') {
           osDarkMediaQuery.addEventListener('change', onSystemThemeChange);
@@ -979,7 +1100,7 @@
         const manifest = {
           name: 'KitchenSync',
           short_name: 'KitchenSync',
-          description: 'Recipes, Meal Plan & Smart Grocery Lists',
+          description: 'Recipes, Meal Plan & Smart Grocery List',
           start_url: '.',
           display: 'standalone',
           background_color: themeColorHex,
@@ -1046,86 +1167,14 @@
     ];
 
     const SEED_SHOPPING_ITEMS = [
-      {
-        id: 'seed_item_1',
-        listId: 'personal',
-        name: 'Salmon Fillets',
-        qty: 2,
-        unit: 'pcs',
-        aisle: 'Meat & Fish',
-        checked: false,
-        sources: []
-      },
-      {
-        id: 'seed_item_2',
-        listId: 'personal',
-        name: 'Chicken Breast',
-        qty: 250,
-        unit: 'g',
-        aisle: 'Meat & Fish',
-        checked: false,
-        sources: []
-      },
-      {
-        id: 'seed_item_3',
-        listId: 'personal',
-        name: 'Instant Ramen',
-        qty: 1,
-        unit: 'pack',
-        aisle: 'Dry Goods & Grains',
-        checked: false,
-        sources: ['Wed Lunch']
-      },
-      {
-        id: 'seed_item_4',
-        listId: 'shared',
-        name: 'Chopped Tomatoes',
-        qty: 4,
-        unit: 'tin',
-        aisle: 'Tins & Jars',
-        checked: false,
-        sources: ['Bulk Staple']
-      },
-      {
-        id: 'seed_item_5',
-        listId: 'shared',
-        name: 'Oat Milk',
-        qty: 2,
-        unit: 'l',
-        aisle: 'Dairy & Chilled',
-        checked: false,
-        sources: ['Household']
-      },
-      {
-        id: 'seed_item_6',
-        listId: 'shared',
-        name: 'Sparkling Water',
-        qty: 6,
-        unit: 'can',
-        aisle: 'Drinks & Household',
-        checked: false,
-        sources: ['Household']
-      },
-      {
-        id: 'seed_item_7',
-        listId: 'shared',
-        name: 'Olive Oil',
-        qty: 1000,
-        unit: 'ml',
-        aisle: 'Tins & Jars',
-        checked: false,
-        sources: ['Household']
-      },
-      {
-        id: 'seed_item_8',
-        listId: 'shared',
-        name: 'Basmati Rice',
-        qty: 1000,
-        unit: 'g',
-        aisle: 'Dry Goods & Grains',
-        checked: false,
-        sources: ['Bulk Staple']
-      }
+      { id: 'seed_item_1', listId: 'personal', name: 'Salmon Fillets', qty: 2, unit: 'pcs', aisle: 'Meat & Fish', checked: false, sources: [] },
+      { id: 'seed_item_2', listId: 'personal', name: 'Chicken Breast', qty: 250, unit: 'g', aisle: 'Meat & Fish', checked: false, sources: [] },
+      { id: 'seed_item_3', listId: 'personal', name: 'Instant Ramen', qty: 1, unit: 'pack', aisle: 'Dry Goods & Grains', checked: false, sources: ['Wed Lunch'] },
+      { id: 'seed_item_4', listId: 'shared', name: 'Chopped Tomatoes', qty: 4, unit: 'tin', aisle: 'Tins & Jars', checked: false, sources: ['Bulk Staple'] },
+      { id: 'seed_item_5', listId: 'shared', name: 'Oat Milk', qty: 2, unit: 'l', aisle: 'Dairy & Chilled', checked: false, sources: ['Household'] },
+      { id: 'seed_item_6', listId: 'shared', name: 'Sparkling Water', qty: 6, unit: 'can', aisle: 'Drinks & Household', checked: false, sources: ['Household'] },
+      { id: 'seed_item_7', listId: 'shared', name: 'Olive Oil', qty: 1000, unit: 'ml', aisle: 'Tins & Jars', checked: false, sources: ['Household'] },
+      { id: 'seed_item_8', listId: 'shared', name: 'Basmati Rice', qty: 1000, unit: 'g', aisle: 'Dry Goods & Grains', checked: false, sources: ['Bulk Staple'] }
     ];
 
     const SEED_PANTRY = [
@@ -1252,7 +1301,7 @@
 
     /**
      * =========================================================================
-     * 3. KITCHENSYNC STORAGE LAYER & AUTOMATIC LEGACY MIGRATION
+     * 3. KITCHENSYNC LOCAL STORAGE LAYER & AUTOMATIC LEGACY MIGRATION
      * =========================================================================
      */
     class KitchenSyncDB {
@@ -1279,10 +1328,6 @@
         }
       }
 
-      /**
-       * One-time migration from `kitchensync_v2_*`, `pantrysync_*`, or `ps_*`
-       * into canonical `kitchensync_*` keys while normalizing UK supermarket aisles.
-       */
       runMigrationIfNeeded() {
         if (localStorage.getItem(this.prefix + 'migrated_v3') === 'true') return;
 
@@ -1294,7 +1339,7 @@
 
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
-          if (!k || k === THEME_STORAGE_KEY) continue;
+          if (!k || k === THEME_STORAGE_KEY || k === FB_CONFIG_STORAGE_KEY || k === HOUSEHOLD_CODE_STORAGE_KEY) continue;
 
           if (k.startsWith('kitchensync_v2_') || k.startsWith('pantrysync_') || k.startsWith('ps_')) {
             try {
@@ -1389,7 +1434,7 @@
 
     /**
      * =========================================================================
-     * 4. APPLICATION STATE & INITIALIZATION
+     * 4. APPLICATION STATE & FIREBASE CLOUD SYNC ENGINE
      * =========================================================================
      */
     let state = {
@@ -1411,6 +1456,669 @@
       openMoveMenuItemId: null
     };
 
+    const cloud = {
+      app: null,
+      auth: null,
+      firestore: null,
+      config: null,
+      configSource: null, // 'code' | 'localStorage' | null
+      user: null,
+      householdCode: '',
+      status: 'local', // 'local' | 'connecting' | 'synced' | 'error'
+      unsubHousehold: null,
+      unsubPrivate: null,
+      isApplyingRemoteHousehold: false,
+      isApplyingRemotePrivate: false,
+      privateSaveTimer: null
+    };
+
+    function sanitizeHouseholdCode(raw) {
+      return String(raw || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 48);
+    }
+
+    function parseFirebaseConfigInput(rawText) {
+      const cleaned = String(rawText || '').trim();
+      if (!cleaned) return null;
+
+      // First try direct JSON parse
+      try {
+        const direct = JSON.parse(cleaned);
+        if (direct && typeof direct === 'object' && direct.apiKey && direct.projectId) {
+          return direct;
+        }
+      } catch (_) {}
+
+      // Extract the `{ ... }` object literal from a JS snippet like `const firebaseConfig = { ... };`
+      const firstBrace = cleaned.indexOf('{');
+      const lastBrace = cleaned.lastIndexOf('}');
+      if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) return null;
+
+      let objStr = cleaned.slice(firstBrace, lastBrace + 1);
+      // Convert single-quoted values to double-quoted and quote unquoted JS property keys
+      objStr = objStr
+        .replace(/\/\/.*$/gm, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/'([^'\\]*(?:\\.[^'\\]*)*)'/g, '"$1"')
+        .replace(/([{,]\s*)([a-zA-Z0-9_$]+)\s*:/g, '$1"$2":')
+        .replace(/,\s*([}\]])/g, '$1');
+
+      try {
+        const parsed = JSON.parse(objStr);
+        if (parsed && typeof parsed === 'object' && parsed.apiKey && parsed.projectId) {
+          return parsed;
+        }
+      } catch (_) {}
+
+      return null;
+    }
+
+    function loadActiveFirebaseConfig() {
+      if (DEFAULT_FIREBASE_CONFIG && typeof DEFAULT_FIREBASE_CONFIG === 'object' && DEFAULT_FIREBASE_CONFIG.apiKey) {
+        cloud.config = DEFAULT_FIREBASE_CONFIG;
+        cloud.configSource = 'code';
+        return;
+      }
+      try {
+        const saved = localStorage.getItem(FB_CONFIG_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.apiKey && parsed.projectId) {
+            cloud.config = parsed;
+            cloud.configSource = 'localStorage';
+            return;
+          }
+        }
+      } catch (_) {}
+      cloud.config = null;
+      cloud.configSource = null;
+    }
+
+    async function initFirebaseEngine() {
+      loadActiveFirebaseConfig();
+
+      // Check URL ?household= invite parameter first, then localStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlHousehold = sanitizeHouseholdCode(urlParams.get('household'));
+      if (urlHousehold) {
+        cloud.householdCode = urlHousehold;
+        try {
+          localStorage.setItem(HOUSEHOLD_CODE_STORAGE_KEY, urlHousehold);
+        } catch (_) {}
+      } else {
+        try {
+          cloud.householdCode = sanitizeHouseholdCode(localStorage.getItem(HOUSEHOLD_CODE_STORAGE_KEY) || '');
+        } catch (_) {}
+      }
+
+      if (!cloud.config) {
+        cloud.status = 'local';
+        updateCloudSyncUI();
+        return;
+      }
+
+      try {
+        cloud.status = 'connecting';
+        updateCloudSyncUI();
+
+        // Clean up any prior app instance if reconfiguring at runtime
+        const existingApps = getApps();
+        for (const a of existingApps) {
+          await deleteApp(a);
+        }
+
+        cloud.app = initializeApp(cloud.config);
+        cloud.auth = getAuth(cloud.app);
+        cloud.firestore = getFirestore(cloud.app);
+
+        // Handle redirect sign-in completion if popup fell back to redirect
+        getRedirectResult(cloud.auth).catch(err => {
+          if (err && err.code) {
+            handleFirebaseAuthError(err);
+          }
+        });
+
+        onAuthStateChanged(cloud.auth, async (user) => {
+          cloud.user = user || null;
+          detachFirestoreListeners();
+
+          if (user) {
+            cloud.status = 'connecting';
+            updateCloudSyncUI();
+            await attachPrivateCloudSync(user);
+            if (cloud.householdCode) {
+              await attachHouseholdCloudSync(user, cloud.householdCode);
+            } else {
+              cloud.status = 'synced';
+              updateCloudSyncUI();
+            }
+          } else {
+            cloud.status = 'local';
+            updateCloudSyncUI();
+          }
+        });
+      } catch (err) {
+        console.error('Firebase initialization failed:', err);
+        cloud.status = 'error';
+        updateCloudSyncUI();
+        showToast('Could not initialize Firebase — check your firebaseConfig.', 'error');
+      }
+    }
+
+    function detachFirestoreListeners() {
+      if (typeof cloud.unsubHousehold === 'function') {
+        cloud.unsubHousehold();
+        cloud.unsubHousehold = null;
+      }
+      if (typeof cloud.unsubPrivate === 'function') {
+        cloud.unsubPrivate();
+        cloud.unsubPrivate = null;
+      }
+    }
+
+    /**
+     * Subscribes to `households/{code}/shared/grocery` for real-time housemate sync.
+     * Merges local Shared Household items on first connect, then applies live snapshots.
+     */
+    async function attachHouseholdCloudSync(user, code) {
+      if (!cloud.firestore || !user || !code) return;
+      if (typeof cloud.unsubHousehold === 'function') {
+        cloud.unsubHousehold();
+        cloud.unsubHousehold = null;
+      }
+
+      cloud.status = 'connecting';
+      updateCloudSyncUI();
+
+      const householdRef = doc(cloud.firestore, 'households', code, 'shared', 'grocery');
+
+      try {
+        const initialSnap = await getDoc(householdRef);
+        const localShared = state.shoppingItems.filter(i => i.listId === 'shared');
+
+        if (initialSnap.exists()) {
+          const remoteItems = Array.isArray(initialSnap.data().items) ? initialSnap.data().items : [];
+          // Merge any local shared items not present in remote cloud list
+          const merged = [...remoteItems];
+          let addedFromLocal = false;
+
+          localShared.forEach(loc => {
+            const existsInRemote = merged.some(rem =>
+              !rem.checked &&
+              !loc.checked &&
+              rem.name.trim().toLowerCase() === loc.name.trim().toLowerCase() &&
+              rem.unit === loc.unit
+            );
+            if (!existsInRemote && !merged.some(rem => rem.id === loc.id)) {
+              merged.push({ ...loc, listId: 'shared' });
+              addedFromLocal = true;
+            }
+          });
+
+          cloud.isApplyingRemoteHousehold = true;
+          const nonShared = state.shoppingItems.filter(i => i.listId !== 'shared');
+          state.shoppingItems = [
+            ...nonShared,
+            ...merged.map(m => ({ ...m, listId: 'shared', aisle: normalizeAisle(m.aisle, m.name) }))
+          ];
+          db.set('shoppingItems', state.shoppingItems);
+          updateAllBadges();
+          if (state.activeTab === 'grocery') renderGroceryView();
+          cloud.isApplyingRemoteHousehold = false;
+
+          if (addedFromLocal) {
+            await setDoc(householdRef, {
+              items: state.shoppingItems.filter(i => i.listId === 'shared'),
+              updatedAt: serverTimestamp(),
+              updatedBy: user.uid
+            }, { merge: true });
+          }
+        } else {
+          // Seed new household room with current local Shared Household list
+          await setDoc(householdRef, {
+            items: localShared,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            updatedBy: user.uid
+          });
+        }
+
+        cloud.unsubHousehold = onSnapshot(householdRef, (snap) => {
+          if (!snap.exists() || snap.metadata.hasPendingWrites) return;
+          const data = snap.data();
+          const remoteShared = (Array.isArray(data.items) ? data.items : []).map(item => ({
+            ...item,
+            listId: 'shared',
+            aisle: normalizeAisle(item.aisle, item.name)
+          }));
+
+          cloud.isApplyingRemoteHousehold = true;
+          const nonShared = state.shoppingItems.filter(i => i.listId !== 'shared');
+          state.shoppingItems = [...nonShared, ...remoteShared];
+          db.set('shoppingItems', state.shoppingItems);
+          updateAllBadges();
+          if (state.activeTab === 'grocery') renderGroceryView();
+          cloud.isApplyingRemoteHousehold = false;
+
+          cloud.status = 'synced';
+          updateCloudSyncUI();
+        }, (err) => {
+          console.error('Household onSnapshot error:', err);
+          cloud.status = 'error';
+          updateCloudSyncUI();
+          showToast('Firestore permission error on household sync — check Security Rules.', 'error');
+        });
+
+        cloud.status = 'synced';
+        updateCloudSyncUI();
+      } catch (err) {
+        console.error('Failed to attach household sync:', err);
+        cloud.status = 'error';
+        updateCloudSyncUI();
+        showToast('Could not connect to household room — check Firestore Rules.', 'error');
+      }
+    }
+
+    /**
+     * Subscribes to `users/{uid}/private/kitchenData` for personal multi-device sync
+     * (Personal & custom lists, recipes, mealPlan, and pantry).
+     */
+    async function attachPrivateCloudSync(user) {
+      if (!cloud.firestore || !user) return;
+      if (typeof cloud.unsubPrivate === 'function') {
+        cloud.unsubPrivate();
+        cloud.unsubPrivate = null;
+      }
+
+      const privateRef = doc(cloud.firestore, 'users', user.uid, 'private', 'kitchenData');
+
+      try {
+        const initialSnap = await getDoc(privateRef);
+        if (initialSnap.exists()) {
+          applyRemotePrivatePayload(initialSnap.data());
+        } else {
+          await pushPrivateStateNow();
+        }
+
+        cloud.unsubPrivate = onSnapshot(privateRef, (snap) => {
+          if (!snap.exists() || snap.metadata.hasPendingWrites) return;
+          applyRemotePrivatePayload(snap.data());
+        }, (err) => {
+          console.warn('Private cloud sync listener warning:', err);
+        });
+      } catch (err) {
+        console.warn('Private cloud sync skipped:', err);
+      }
+    }
+
+    function applyRemotePrivatePayload(data) {
+      if (!data || typeof data !== 'object') return;
+      cloud.isApplyingRemotePrivate = true;
+
+      if (Array.isArray(data.lists) && data.lists.length >= 2) {
+        state.lists = data.lists;
+        db.set('lists', state.lists);
+      }
+      if (Array.isArray(data.personalItems)) {
+        const sharedOnly = state.shoppingItems.filter(i => i.listId === 'shared');
+        const normalizedPersonal = data.personalItems
+          .filter(i => i.listId !== 'shared')
+          .map(i => ({ ...i, aisle: normalizeAisle(i.aisle, i.name) }));
+        state.shoppingItems = [...normalizedPersonal, ...sharedOnly];
+        db.set('shoppingItems', state.shoppingItems);
+      }
+      if (Array.isArray(data.recipes) && data.recipes.length > 0) {
+        state.recipes = data.recipes.map(r => ({
+          ...r,
+          ingredients: (r.ingredients || []).map(ing => ({ ...ing, aisle: normalizeAisle(ing.aisle, ing.name) }))
+        }));
+        db.set('recipes', state.recipes);
+      }
+      if (Array.isArray(data.pantry)) {
+        state.pantry = data.pantry;
+        db.set('pantry', state.pantry);
+      }
+      if (data.mealPlan && typeof data.mealPlan === 'object') {
+        state.mealPlan = data.mealPlan;
+        DAYS_OF_WEEK.forEach(d => {
+          if (!Array.isArray(state.mealPlan[d])) state.mealPlan[d] = [];
+        });
+        db.set('mealPlan', state.mealPlan);
+      }
+
+      updateAllBadges();
+      if (state.activeTab === 'grocery') renderGroceryView();
+      if (state.activeTab === 'recipes') renderRecipes();
+      if (state.activeTab === 'planner') renderMealPlanner();
+      if (state.activeTab === 'pantry') renderPantry();
+
+      cloud.isApplyingRemotePrivate = false;
+    }
+
+    async function pushSharedItemsToCloud() {
+      if (cloud.isApplyingRemoteHousehold) return;
+      if (!cloud.firestore || !cloud.user || !cloud.householdCode) return;
+
+      try {
+        const householdRef = doc(cloud.firestore, 'households', cloud.householdCode, 'shared', 'grocery');
+        const sharedItems = state.shoppingItems.filter(i => i.listId === 'shared');
+        await setDoc(householdRef, {
+          items: sharedItems,
+          updatedAt: serverTimestamp(),
+          updatedBy: cloud.user.uid
+        }, { merge: true });
+      } catch (err) {
+        console.error('Error syncing Shared Household items:', err);
+      }
+    }
+
+    function schedulePushPrivateToCloud() {
+      if (cloud.isApplyingRemotePrivate) return;
+      if (!cloud.firestore || !cloud.user) return;
+
+      clearTimeout(cloud.privateSaveTimer);
+      cloud.privateSaveTimer = setTimeout(() => {
+        pushPrivateStateNow();
+      }, 600);
+    }
+
+    async function pushPrivateStateNow() {
+      if (!cloud.firestore || !cloud.user) return;
+      try {
+        const privateRef = doc(cloud.firestore, 'users', cloud.user.uid, 'private', 'kitchenData');
+        const personalItems = state.shoppingItems.filter(i => i.listId !== 'shared');
+        await setDoc(privateRef, {
+          lists: state.lists,
+          personalItems,
+          recipes: state.recipes,
+          mealPlan: state.mealPlan,
+          pantry: state.pantry,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+      } catch (err) {
+        console.warn('Error saving private cloud backup:', err);
+      }
+    }
+
+    /**
+     * Central persistence hook called whenever shoppingItems change
+     */
+    function persistShoppingItems(syncShared = true, syncPrivate = true) {
+      db.set('shoppingItems', state.shoppingItems);
+      updateAllBadges();
+      if (syncShared) pushSharedItemsToCloud();
+      if (syncPrivate) schedulePushPrivateToCloud();
+    }
+
+    function updateCloudSyncUI() {
+      const dot = document.getElementById('cloud-sync-dot');
+      const dotWrapper = document.getElementById('cloud-sync-dot-wrapper');
+      const label = document.getElementById('cloud-sync-label');
+      const modalDot = document.getElementById('modal-sync-indicator');
+
+      // Remove any existing ping ring
+      const existingPing = dotWrapper?.querySelector('.animate-ping');
+      if (existingPing) existingPing.remove();
+
+      if (cloud.status === 'synced' && cloud.user) {
+        const ping = document.createElement('span');
+        ping.className = `animate-ping absolute inline-flex h-full w-full rounded-full ${cloud.householdCode ? 'bg-indigo-400' : 'bg-emerald-400'} opacity-75`;
+        dotWrapper?.prepend(ping);
+
+        if (dot) dot.className = `relative inline-flex rounded-full h-2 w-2 ${cloud.householdCode ? 'bg-indigo-500' : 'bg-emerald-500'}`;
+        if (modalDot) modalDot.className = `w-2.5 h-2.5 rounded-full ${cloud.householdCode ? 'bg-indigo-500' : 'bg-emerald-500'}`;
+        if (label) {
+          label.textContent = cloud.householdCode ? `Live Sync • ${cloud.householdCode}` : 'Signed In • Personal';
+        }
+      } else if (cloud.status === 'connecting') {
+        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-400 animate-pulse';
+        if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
+        if (label) label.textContent = 'Syncing...';
+      } else if (cloud.status === 'error') {
+        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-rose-500';
+        if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+        if (label) label.textContent = 'Sync Error';
+      } else {
+        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-slate-400';
+        if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400';
+        if (label) label.textContent = cloud.config ? 'Sign In to Sync' : 'Local Only';
+      }
+
+      // Update Cloud Sync Modal internals
+      const configStatusText = document.getElementById('fb-config-status-text');
+      const configEditorBox = document.getElementById('fb-config-editor-box');
+      const clearConfigBtn = document.getElementById('btn-clear-fb-config');
+      const authSection = document.getElementById('fb-auth-section');
+      const authHint = document.getElementById('fb-auth-hint');
+      const signedOutControls = document.getElementById('fb-signed-out-controls');
+      const signedInCard = document.getElementById('fb-signed-in-card');
+      const householdSection = document.getElementById('fb-household-section');
+      const householdInput = document.getElementById('household-code-input');
+      const activeHouseholdStatus = document.getElementById('active-household-status');
+      const activeHouseholdStatusText = document.getElementById('active-household-status-text');
+
+      if (!configStatusText) return;
+
+      if (cloud.config) {
+        configStatusText.textContent = `Connected (${cloud.config.projectId})`;
+        configStatusText.className = 'font-bold text-emerald-600 dark:text-emerald-400';
+        if (cloud.configSource === 'localStorage') {
+          clearConfigBtn?.classList.remove('hidden');
+        } else {
+          clearConfigBtn?.classList.add('hidden');
+        }
+        // Enable Step 2 (Auth)
+        authSection?.classList.remove('opacity-60', 'pointer-events-none');
+      } else {
+        configStatusText.textContent = 'Not Configured';
+        configStatusText.className = 'font-bold text-amber-600 dark:text-amber-400';
+        configEditorBox?.classList.remove('hidden');
+        clearConfigBtn?.classList.add('hidden');
+        authSection?.classList.add('opacity-60', 'pointer-events-none');
+      }
+
+      if (cloud.user) {
+        if (authHint) authHint.textContent = 'Authenticated';
+        signedOutControls?.classList.add('hidden');
+        signedInCard?.classList.remove('hidden');
+
+        const providerId = cloud.user.providerData?.[0]?.providerId || (cloud.user.isAnonymous ? 'anonymous' : 'firebase');
+        const providerLabel = providerId.includes('github')
+          ? 'GitHub'
+          : providerId.includes('google')
+            ? 'Google'
+            : 'Guest (Anonymous)';
+
+        document.getElementById('fb-user-display-name').textContent =
+          cloud.user.displayName || cloud.user.email || 'Guest Device';
+        document.getElementById('fb-user-provider-badge').textContent = providerLabel;
+        document.getElementById('fb-user-uid').textContent = `${cloud.user.uid.slice(0, 10)}...`;
+
+        // Enable Step 3 (Household Room)
+        householdSection?.classList.remove('opacity-60', 'pointer-events-none');
+      } else {
+        if (authHint) authHint.textContent = cloud.config ? 'Choose a sign-in method' : 'Connect Firebase above first';
+        signedOutControls?.classList.remove('hidden');
+        signedInCard?.classList.add('hidden');
+        householdSection?.classList.add('opacity-60', 'pointer-events-none');
+      }
+
+      if (householdInput && document.activeElement !== householdInput) {
+        householdInput.value = cloud.householdCode || '';
+      }
+
+      if (cloud.user && cloud.householdCode) {
+        activeHouseholdStatus?.classList.remove('hidden');
+        if (activeHouseholdStatusText) {
+          activeHouseholdStatusText.textContent = `Live syncing "Shared Household" list in room: ${cloud.householdCode}`;
+        }
+      } else {
+        activeHouseholdStatus?.classList.add('hidden');
+      }
+    }
+
+    function openCloudSyncModal() {
+      const textarea = document.getElementById('fb-config-textarea');
+      if (textarea && cloud.config && !textarea.value.trim()) {
+        textarea.value = JSON.stringify(cloud.config, null, 2);
+      }
+      const configEditorBox = document.getElementById('fb-config-editor-box');
+      if (cloud.config) {
+        configEditorBox?.classList.add('hidden');
+      } else {
+        configEditorBox?.classList.remove('hidden');
+      }
+      updateCloudSyncUI();
+      openModal('sync-modal');
+    }
+
+    function toggleFirebaseConfigEditor() {
+      const box = document.getElementById('fb-config-editor-box');
+      box?.classList.toggle('hidden');
+    }
+
+    async function saveRuntimeFirebaseConfig() {
+      const raw = document.getElementById('fb-config-textarea')?.value || '';
+      const parsed = parseFirebaseConfigInput(raw);
+      if (!parsed) {
+        showToast('Invalid firebaseConfig — include apiKey and projectId.', 'error');
+        return;
+      }
+
+      try {
+        localStorage.setItem(FB_CONFIG_STORAGE_KEY, JSON.stringify(parsed));
+      } catch (_) {}
+
+      await initFirebaseEngine();
+      document.getElementById('fb-config-editor-box')?.classList.add('hidden');
+      showToast(`Connected to Firebase project "${parsed.projectId}"!`);
+    }
+
+    async function clearSavedFirebaseConfig() {
+      detachFirestoreListeners();
+      try {
+        localStorage.removeItem(FB_CONFIG_STORAGE_KEY);
+      } catch (_) {}
+      cloud.user = null;
+      await initFirebaseEngine();
+      showToast('Disconnected local Firebase config');
+    }
+
+    function handleFirebaseAuthError(err) {
+      console.error('Firebase Auth error:', err);
+      const code = err?.code || '';
+      if (code === 'auth/unauthorized-domain') {
+        showToast('Domain not authorized — add your github.io domain in Firebase Auth Settings.', 'error');
+      } else if (code === 'auth/operation-not-allowed') {
+        showToast('Enable this sign-in provider under Firebase Console → Authentication → Sign-in method.', 'error');
+      } else if (code === 'auth/account-exists-with-different-credential') {
+        showToast('An account already exists with the same email using another sign-in provider.', 'error');
+      } else if (code === 'auth/popup-closed-by-user') {
+        showToast('Sign-in popup closed before completing.', 'error');
+      } else {
+        showToast(`Sign-in error: ${err?.message || code || 'Unknown error'}`, 'error');
+      }
+    }
+
+    async function signInWithGithub() {
+      if (!cloud.auth) return;
+      const provider = new GithubAuthProvider();
+      try {
+        await signInWithPopup(cloud.auth, provider);
+        showToast('Signed in with GitHub!');
+      } catch (err) {
+        if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/operation-not-supported-in-this-environment') {
+          await signInWithRedirect(cloud.auth, provider);
+        } else {
+          handleFirebaseAuthError(err);
+        }
+      }
+    }
+
+    async function signInWithGoogle() {
+      if (!cloud.auth) return;
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(cloud.auth, provider);
+        showToast('Signed in with Google!');
+      } catch (err) {
+        if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/operation-not-supported-in-this-environment') {
+          await signInWithRedirect(cloud.auth, provider);
+        } else {
+          handleFirebaseAuthError(err);
+        }
+      }
+    }
+
+    async function signInAsGuest() {
+      if (!cloud.auth) return;
+      try {
+        await signInAnonymously(cloud.auth);
+        showToast('Signed in as Guest! Enter a Household Code to sync.');
+      } catch (err) {
+        handleFirebaseAuthError(err);
+      }
+    }
+
+    async function signOutFirebase() {
+      if (!cloud.auth) return;
+      detachFirestoreListeners();
+      await signOut(cloud.auth);
+      showToast('Signed out — switched to Local Only mode');
+    }
+
+    function generateRandomHouseholdCode() {
+      const adjectives = ['flat', 'house', 'kitchen', 'pantry', 'larder', 'table'];
+      const herbs = ['basil', 'thyme', 'olive', 'chilli', 'garlic', 'ginger', 'sage', 'pepper'];
+      const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+      const herb = herbs[Math.floor(Math.random() * herbs.length)];
+      const num = Math.floor(10 + Math.random() * 89);
+      const code = `${adj}-${num}-${herb}`;
+      const input = document.getElementById('household-code-input');
+      if (input) input.value = code;
+    }
+
+    async function handleSaveHouseholdCode(e) {
+      e.preventDefault();
+      const input = document.getElementById('household-code-input');
+      const code = sanitizeHouseholdCode(input?.value || '');
+      if (code.length < 3) {
+        showToast('Enter a household code at least 3 characters long.', 'error');
+        return;
+      }
+
+      cloud.householdCode = code;
+      try {
+        localStorage.setItem(HOUSEHOLD_CODE_STORAGE_KEY, code);
+      } catch (_) {}
+
+      if (cloud.user && cloud.firestore) {
+        await attachHouseholdCloudSync(cloud.user, code);
+        showToast(`Joined Shared Household room: "${code}"`);
+      } else {
+        updateCloudSyncUI();
+        showToast(`Saved room "${code}" — sign in above to start syncing`);
+      }
+    }
+
+    function copyInviteLink() {
+      const rawInput = document.getElementById('household-code-input')?.value || cloud.householdCode;
+      const code = sanitizeHouseholdCode(rawInput);
+      const baseUrl = `${window.location.origin}${window.location.pathname}`;
+      const inviteUrl = code ? `${baseUrl}?household=${encodeURIComponent(code)}` : baseUrl;
+      copyTextToClipboard(inviteUrl);
+      showToast(code ? `Copied invite link for room "${code}"!` : 'Copied app link!');
+    }
+
+    /**
+     * =========================================================================
+     * 5. INITIALIZATION
+     * =========================================================================
+     */
     function initApp() {
       initThemeSystem();
       db.runMigrationIfNeeded();
@@ -1442,11 +2150,12 @@
 
       updateAllBadges();
       switchTab('grocery');
+      initFirebaseEngine();
     }
 
     /**
      * =========================================================================
-     * 5. NAVIGATION, MODALS & FORMATTING HELPERS
+     * 6. NAVIGATION, MODALS & FORMATTING HELPERS
      * =========================================================================
      */
     function switchTab(tab) {
@@ -1523,7 +2232,7 @@
       setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      }, 3200);
     }
 
     function escapeHTML(str) {
@@ -1592,7 +2301,7 @@
 
     /**
      * =========================================================================
-     * 6. SMART INGREDIENT PARSER, UK AISLE DETECTOR & MERGING ENGINE
+     * 7. SMART INGREDIENT PARSER, UK AISLE DETECTOR & MERGING ENGINE
      * =========================================================================
      */
     function detectAisle(name) {
@@ -1682,13 +2391,12 @@
         }
       });
 
-      db.set('shoppingItems', state.shoppingItems);
-      updateAllBadges();
+      persistShoppingItems(validListId === 'shared', validListId !== 'shared');
     }
 
     /**
      * =========================================================================
-     * 7. MULTI-GROCERY LISTS VIEW & CROSS-LIST ACTIONS
+     * 8. MULTI-GROCERY LISTS VIEW & CROSS-LIST ACTIONS
      * =========================================================================
      */
     function setActiveList(listId) {
@@ -2015,15 +2723,15 @@
       const item = state.shoppingItems.find(i => i.id === itemId);
       if (!item) return;
       item.checked = !item.checked;
-      db.set('shoppingItems', state.shoppingItems);
-      updateAllBadges();
+      persistShoppingItems(item.listId === 'shared', item.listId !== 'shared');
       renderGroceryView();
     }
 
     function deleteShoppingItem(itemId) {
+      const item = state.shoppingItems.find(i => i.id === itemId);
+      if (!item) return;
       state.shoppingItems = state.shoppingItems.filter(i => i.id !== itemId);
-      db.set('shoppingItems', state.shoppingItems);
-      updateAllBadges();
+      persistShoppingItems(item.listId === 'shared', item.listId !== 'shared');
       renderGroceryView();
     }
 
@@ -2046,10 +2754,10 @@
       if (idx < 0) return;
 
       const item = state.shoppingItems[idx];
+      const sourceListId = item.listId;
       const targetList = state.lists.find(l => l.id === targetListId);
       if (!targetList) return;
 
-      // Remove from current slot and merge into targetListId (so duplicates combine cleanly!)
       state.shoppingItems.splice(idx, 1);
       mergeItemsIntoList([{
         name: item.name,
@@ -2058,7 +2766,6 @@
         aisle: item.aisle
       }], targetListId, null);
 
-      // Preserve any existing source badges on the merged/moved item
       if (item.sources && item.sources.length > 0) {
         const normName = item.name.trim().toLowerCase();
         const norm = normalizeUnitForMerge(item.qty, item.unit);
@@ -2068,9 +2775,13 @@
         );
         if (destItem) {
           destItem.sources = Array.from(new Set([...(destItem.sources || []), ...item.sources]));
-          db.set('shoppingItems', state.shoppingItems);
         }
       }
+
+      // Sync both source and destination buckets if either was 'shared'
+      const touchesShared = sourceListId === 'shared' || targetListId === 'shared';
+      const touchesPrivate = sourceListId !== 'shared' || targetListId !== 'shared';
+      persistShoppingItems(touchesShared, touchesPrivate);
 
       state.openMoveMenuItemId = null;
       renderGroceryView();
@@ -2088,36 +2799,43 @@
       );
       if (checkedInScope.length === 0) return;
 
-      let addedCount = 0;
+      let touchesShared = false;
+      let touchesPrivate = false;
+
       checkedInScope.forEach(item => {
+        if (item.listId === 'shared') touchesShared = true;
+        else touchesPrivate = true;
+
         const exists = state.pantry.some(p => p.toLowerCase() === item.name.trim().toLowerCase());
         if (!exists) {
           state.pantry.push(item.name.trim());
-          addedCount++;
         }
       });
 
-      // Remove those checked items from shoppingItems
       const idsToRemove = new Set(checkedInScope.map(i => i.id));
       state.shoppingItems = state.shoppingItems.filter(i => !idsToRemove.has(i.id));
 
       db.set('pantry', state.pantry);
-      db.set('shoppingItems', state.shoppingItems);
-      updateAllBadges();
+      persistShoppingItems(touchesShared, true);
       renderGroceryView();
       showToast(`Moved ${checkedInScope.length} items to Pantry`);
     }
 
     function clearCheckedItems() {
-      const before = state.shoppingItems.length;
-      state.shoppingItems = state.shoppingItems.filter(i =>
-        !(i.checked && (state.activeListId === 'all' || i.listId === state.activeListId))
+      const toRemove = state.shoppingItems.filter(i =>
+        i.checked && (state.activeListId === 'all' || i.listId === state.activeListId)
       );
-      const removed = before - state.shoppingItems.length;
-      db.set('shoppingItems', state.shoppingItems);
-      updateAllBadges();
+      if (toRemove.length === 0) return;
+
+      const touchesShared = toRemove.some(i => i.listId === 'shared');
+      const touchesPrivate = toRemove.some(i => i.listId !== 'shared');
+
+      const idsToRemove = new Set(toRemove.map(i => i.id));
+      state.shoppingItems = state.shoppingItems.filter(i => !idsToRemove.has(i.id));
+
+      persistShoppingItems(touchesShared, touchesPrivate);
       renderGroceryView();
-      showToast(`Cleared ${removed} checked items`);
+      showToast(`Cleared ${toRemove.length} checked items`);
     }
 
     function copyGroceryListForChat() {
@@ -2183,6 +2901,7 @@
       });
 
       db.set('lists', state.lists);
+      schedulePushPrivateToCloud();
       nameInput.value = '';
       descInput.value = '';
       closeModal('new-list-modal');
@@ -2195,24 +2914,22 @@
       const target = state.lists.find(l => l.id === listId);
       if (!target) return;
 
-      // Reassign any orphaned items on that custom list to 'personal' so nothing is lost
       state.shoppingItems.forEach(item => {
         if (item.listId === listId) item.listId = 'personal';
       });
 
       state.lists = state.lists.filter(l => l.id !== listId);
       db.set('lists', state.lists);
-      db.set('shoppingItems', state.shoppingItems);
+      persistShoppingItems(false, true);
 
       if (state.activeListId === listId) state.activeListId = 'personal';
-      updateAllBadges();
       renderGroceryView();
       showToast(`Deleted "${target.name}" (items moved to Personal)`);
     }
 
     /**
      * =========================================================================
-     * 7. PANTRY INVENTORY & MATCHING HELPERS
+     * 9. PANTRY INVENTORY & MATCHING HELPERS
      * =========================================================================
      */
     function isIngredientInPantry(ingName) {
@@ -2281,6 +2998,7 @@
 
       state.pantry.push(formatted);
       db.set('pantry', state.pantry);
+      schedulePushPrivateToCloud();
       input.value = '';
       updateAllBadges();
       renderPantry();
@@ -2290,6 +3008,7 @@
     function removePantryItem(name) {
       state.pantry = state.pantry.filter(p => p !== name);
       db.set('pantry', state.pantry);
+      schedulePushPrivateToCloud();
       updateAllBadges();
       renderPantry();
       showToast(`Removed "${name}" from Pantry`);
@@ -2297,7 +3016,7 @@
 
     /**
      * =========================================================================
-     * 8. RECIPES VIEW, RECIPE DETAIL & PER-INGREDIENT LIST ROUTING
+     * 10. RECIPES VIEW, RECIPE DETAIL & PER-INGREDIENT LIST ROUTING
      * =========================================================================
      */
     function renderRecipes() {
@@ -2626,7 +3345,7 @@
 
     /**
      * =========================================================================
-     * 9. ADD / EDIT RECIPE MODAL & QUICK-PASTE PARSER
+     * 11. ADD / EDIT RECIPE MODAL & QUICK-PASTE PARSER
      * =========================================================================
      */
     function openRecipeFormModal(recipeId = null) {
@@ -2752,6 +3471,7 @@
       }
 
       db.set('recipes', state.recipes);
+      schedulePushPrivateToCloud();
       updateAllBadges();
       renderRecipes();
       closeModal('recipe-form-modal');
@@ -2761,6 +3481,7 @@
     function deleteRecipe(recipeId) {
       state.recipes = state.recipes.filter(r => r.id !== recipeId);
       db.set('recipes', state.recipes);
+      schedulePushPrivateToCloud();
       updateAllBadges();
       renderRecipes();
       closeModal('recipe-detail-modal');
@@ -2769,7 +3490,7 @@
 
     /**
      * =========================================================================
-     * 10. WEEKLY MEAL PLANNER (PERSONAL VS SHARED SCOPE + SMART ROUTE)
+     * 12. WEEKLY MEAL PLANNER (PERSONAL VS SHARED SCOPE + SMART ROUTE)
      * =========================================================================
      */
     let activeMealSlotMode = 'recipe';
@@ -2967,6 +3688,7 @@
       }
 
       db.set('mealPlan', state.mealPlan);
+      schedulePushPrivateToCloud();
       closeModal('meal-slot-modal');
       renderMealPlanner();
       showToast(`Planned ${scope === 'shared' ? 'Shared' : 'Personal'} meal for ${day}`);
@@ -2993,6 +3715,7 @@
       }
 
       db.set('mealPlan', state.mealPlan);
+      schedulePushPrivateToCloud();
       closeModal('meal-slot-modal');
       renderMealPlanner();
       showToast(`Added "${title}" to ${day}`);
@@ -3001,12 +3724,14 @@
     function removeMealSlot(day, mealId) {
       state.mealPlan[day] = (state.mealPlan[day] || []).filter(m => m.id !== mealId);
       db.set('mealPlan', state.mealPlan);
+      schedulePushPrivateToCloud();
       renderMealPlanner();
     }
 
     function clearMealPlan() {
       DAYS_OF_WEEK.forEach(d => (state.mealPlan[d] = []));
       db.set('mealPlan', state.mealPlan);
+      schedulePushPrivateToCloud();
       renderMealPlanner();
       showToast('Weekly meal plan cleared');
     }
@@ -3101,19 +3826,13 @@
 
     /**
      * =========================================================================
-     * 11. BACKUP / EXPORT / CLIPBOARD HELPERS
+     * 13. BACKUP / EXPORT / CLIPBOARD HELPERS & GLOBAL EXPORTS
      * =========================================================================
      */
-    function copyInviteLink() {
-      const val = document.getElementById('invite-link-input').value;
-      copyTextToClipboard(val);
-      showToast('Copied housemate invite link!');
-    }
-
     function exportBackupJSON() {
       const payload = {
         app: 'KitchenSync',
-        version: 2,
+        version: 3,
         exportedAt: new Date().toISOString(),
         lists: state.lists,
         shoppingItems: state.shoppingItems,
@@ -3144,7 +3863,7 @@
           if (Array.isArray(data.pantry)) { state.pantry = data.pantry; db.set('pantry', state.pantry); }
           if (data.mealPlan && typeof data.mealPlan === 'object') { state.mealPlan = data.mealPlan; db.set('mealPlan', state.mealPlan); }
 
-          updateAllBadges();
+          persistShoppingItems(true, true);
           switchTab(state.activeTab);
           closeModal('sync-modal');
           showToast('Successfully imported JSON backup!');
@@ -3170,7 +3889,73 @@
       document.body.removeChild(textarea);
     }
 
-    window.addEventListener('DOMContentLoaded', initApp);
+    // Expose all inline HTML event handlers onto window (required for ES modules)
+    Object.assign(window, {
+      switchTab,
+      setThemeMode,
+      openModal,
+      closeModal,
+      openCloudSyncModal,
+      toggleFirebaseConfigEditor,
+      saveRuntimeFirebaseConfig,
+      clearSavedFirebaseConfig,
+      signInWithGithub,
+      signInWithGoogle,
+      signInAsGuest,
+      signOutFirebase,
+      generateRandomHouseholdCode,
+      handleSaveHouseholdCode,
+      copyInviteLink,
+      setActiveList,
+      setGroceryViewMode,
+      handleQuickAddItem,
+      toggleItemChecked,
+      deleteShoppingItem,
+      handleCrossListMoveClick,
+      moveItemToList,
+      toggleAisleCollapse,
+      moveCheckedItemsToPantry,
+      clearCheckedItems,
+      copyGroceryListForChat,
+      handleCreateCustomList,
+      deleteCustomList,
+      renderPantry,
+      handleAddPantryItem,
+      removePantryItem,
+      renderRecipes,
+      setRecipeTagFilter,
+      openRecipeDetail,
+      setDetailMultiplier,
+      toggleDetailStep,
+      setDetailGlobalList,
+      cycleIngredientTargetList,
+      sendRecipeIngredientsToLists,
+      openRecipeFormModal,
+      addFormIngredientRow,
+      parseQuickPasteIngredients,
+      saveRecipeForm,
+      deleteRecipe,
+      renderMealPlanner,
+      openMealSlotModal,
+      syncSlotRecipeDefaultServings,
+      setMealSlotMode,
+      applyCustomMealPreset,
+      saveRecipeMealSlot,
+      saveCustomMealSlot,
+      removeMealSlot,
+      clearMealPlan,
+      openGenerateWeekModal,
+      toggleWeekOverrideSelect,
+      executeGenerateWeekShoppingList,
+      exportBackupJSON,
+      importBackupJSON
+    });
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
   </script>
 </body>
 </html>
