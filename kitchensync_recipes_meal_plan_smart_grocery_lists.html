@@ -1,0 +1,3176 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" id="meta-theme-color" content="#020617" />
+  <meta name="description" content="KitchenSync — Recipes, Meal Plan & Smart Grocery Lists" />
+  <title>KitchenSync — Recipes, Meal Plan & Smart Grocery Lists</title>
+
+  <!-- Dynamic Blob PWA Manifest attached & updated by ThemeManager -->
+  <link rel="manifest" id="pwa-manifest" />
+
+  <!-- Inter Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Pre-paint Theme Boot Script: prevents FOUC before Tailwind & body render -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('kitchensync_theme') || 'system';
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = saved === 'dark' || (saved === 'system' && prefersDark);
+        document.documentElement.classList.toggle('dark', isDark);
+        var meta = document.getElementById('meta-theme-color');
+        if (meta) meta.setAttribute('content', isDark ? '#020617' : '#fafaf9');
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* =======================================================================
+       THEME DESIGN TOKENS (LIGHT & DARK CSS CUSTOM PROPERTIES)
+       ======================================================================= */
+    :root {
+      --bg-app: #fafaf9;
+      --bg-header: rgba(250, 250, 249, 0.88);
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f5f5f4;
+      --bg-input: #f5f5f4;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --border-subtle: #e7e5e4;
+      --border-strong: #d6d3d1;
+      --accent-primary: #059669;
+      --accent-personal: #059669;
+      --accent-shared: #4f46e5;
+      --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+      --shadow-popover: 0 12px 28px -4px rgba(15, 23, 42, 0.14);
+      color-scheme: light;
+    }
+
+    html.dark {
+      --bg-app: #020617;
+      --bg-header: rgba(2, 6, 23, 0.90);
+      --bg-surface: #0f172a;
+      --bg-surface-elevated: #1e293b;
+      --bg-input: #090d16;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border-subtle: #1e293b;
+      --border-strong: #334155;
+      --accent-primary: #10b981;
+      --accent-personal: #10b981;
+      --accent-shared: #818cf8;
+      --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.25);
+      --shadow-popover: 0 16px 32px -4px rgba(0, 0, 0, 0.55);
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Hide scrollbars on horizontal pill bars while maintaining smooth touch scrolling */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-emerald-500/25 selection:text-emerald-700 dark:selection:text-emerald-200">
+
+  <!-- Toast Notification Container (Replaces alert/confirm) -->
+  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ===================================================================== -->
+  <!-- TOP NAVIGATION HEADER                                                 -->
+  <!-- ===================================================================== -->
+  <header style="background-color: var(--bg-header); border-color: var(--border-subtle);" class="sticky top-0 z-30 backdrop-blur-md border-b transition-colors">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-3">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
+          <!-- Custom Inline SVG KitchenSync Logo -->
+          <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M6 6v10a4 4 0 004 4h4a4 4 0 004-4V6" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 11l2 2 4-4" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <h1 style="color: var(--text-primary);" class="font-extrabold text-base sm:text-lg tracking-tight leading-none">KitchenSync</h1>
+            <span style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="hidden lg:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 border">
+              Multi-List
+            </span>
+          </div>
+          <p style="color: var(--text-muted);" class="hidden sm:block text-xs truncate mt-0.5">Recipes, Meal Plan & Smart Grocery Lists</p>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Tabs -->
+      <nav style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="hidden md:flex items-center p-1 rounded-xl border" aria-label="Primary Navigation">
+        <button onclick="switchTab('grocery')" data-tab="grocery" class="nav-tab-desktop px-3.5 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+          <span>Grocery Lists</span>
+          <span id="badge-grocery-desktop" class="text-xs px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold">0</span>
+        </button>
+        <button onclick="switchTab('recipes')" data-tab="recipes" class="nav-tab-desktop px-3.5 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+          <span>Recipes</span>
+          <span id="badge-recipes-desktop" style="background-color: var(--bg-surface); color: var(--text-secondary);" class="text-xs px-1.5 py-0.2 rounded-md font-semibold">4</span>
+        </button>
+        <button onclick="switchTab('planner')" data-tab="planner" class="nav-tab-desktop px-3.5 py-1.5 rounded-lg text-sm font-semibold transition">
+          Meal Plan
+        </button>
+        <button onclick="switchTab('pantry')" data-tab="pantry" class="nav-tab-desktop px-3.5 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+          <span>Pantry</span>
+          <span id="badge-pantry-desktop" style="background-color: var(--bg-surface); color: var(--text-secondary);" class="text-xs px-1.5 py-0.2 rounded-md font-semibold">0</span>
+        </button>
+      </nav>
+
+      <!-- Right Controls: 3-Way Theme Switcher + Household Sync -->
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- 3-Way Segmented Theme Selector (Light / Dark / System) -->
+        <div
+          id="theme-switcher"
+          role="radiogroup"
+          aria-label="Theme selector"
+          style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);"
+          class="inline-flex items-center p-1 rounded-xl border"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked="false"
+            data-theme-option="light"
+            onclick="setThemeMode('light')"
+            title="Light theme"
+            aria-label="Light theme"
+            class="theme-btn px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+          >
+            <!-- Sun Icon -->
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="4" />
+              <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" />
+            </svg>
+            <span class="hidden xl:inline">Light</span>
+          </button>
+
+          <button
+            type="button"
+            role="radio"
+            aria-checked="false"
+            data-theme-option="dark"
+            onclick="setThemeMode('dark')"
+            title="Dark theme"
+            aria-label="Dark theme"
+            class="theme-btn px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+          >
+            <!-- Moon Icon -->
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+            <span class="hidden xl:inline">Dark</span>
+          </button>
+
+          <button
+            type="button"
+            role="radio"
+            aria-checked="true"
+            data-theme-option="system"
+            onclick="setThemeMode('system')"
+            title="System theme (Auto)"
+            aria-label="System theme"
+            class="theme-btn px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+          >
+            <!-- Monitor / Auto Icon -->
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <path stroke-linecap="round" d="M8 21h8m-4-4v4" />
+            </svg>
+            <span class="hidden xl:inline">System</span>
+          </button>
+        </div>
+
+        <!-- Household Sync Status Badge -->
+        <button
+          onclick="openModal('sync-modal')"
+          style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary);"
+          class="px-3 py-2 rounded-xl hover:border-indigo-500/50 border text-xs font-semibold flex items-center gap-2 transition shrink-0"
+          title="View Firestore Multi-List Sync Architecture"
+        >
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+          </span>
+          <span class="hidden sm:inline">Sync</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN CONTENT WORKSPACE                                                -->
+  <!-- ===================================================================== -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6 pb-28 md:pb-12">
+
+    <!-- =================================================================== -->
+    <!-- VIEW 1: MULTI-GROCERY LISTS                                         -->
+    <!-- =================================================================== -->
+    <section id="tab-grocery" class="space-y-5">
+      <!-- Top Title & Active List Description -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 style="color: var(--text-primary);" class="text-2xl font-extrabold tracking-tight">Grocery Lists</h2>
+          <p id="active-list-subtitle" style="color: var(--text-muted);" class="text-sm">
+            Solo weekday meals & personal items
+          </p>
+        </div>
+
+        <!-- View Mode & List Toolbar -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- By Aisle vs Flat List Toggle -->
+          <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="inline-flex rounded-xl p-1 border">
+            <button onclick="setGroceryViewMode('aisle')" id="btn-view-aisle" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+              By Aisle
+            </button>
+            <button onclick="setGroceryViewMode('flat')" id="btn-view-flat" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+              Flat List
+            </button>
+          </div>
+
+          <button
+            onclick="copyGroceryListForChat()"
+            style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);"
+            class="px-3.5 py-2 rounded-xl border hover:border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition"
+          >
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            <span>Copy for WhatsApp / Text</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- List Switcher Pills Bar -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" id="list-switcher-bar">
+        <!-- Populated dynamically via JS -->
+      </div>
+
+      <!-- Quick Add Item Bar -->
+      <form
+        onsubmit="handleQuickAddItem(event)"
+        style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);"
+        class="p-3.5 rounded-2xl border flex flex-col lg:flex-row gap-2.5"
+      >
+        <div class="flex-1 relative">
+          <input
+            type="text"
+            id="quick-add-input"
+            style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);"
+            placeholder='Add item (e.g. "4 tins chopped tomatoes", "500g pasta", "6x Coke Zero")...'
+            class="w-full px-4 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition"
+            required
+          />
+        </div>
+
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+          <!-- Aisle Selector -->
+          <select
+            id="quick-add-aisle"
+            aria-label="Supermarket Aisle"
+            style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-secondary);"
+            class="flex-1 sm:w-44 px-3 py-2.5 rounded-xl border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+          >
+            <option value="AUTO">Auto Aisle</option>
+            <option value="Produce">Produce</option>
+            <option value="Meat & Fish">Meat & Fish</option>
+            <option value="Dairy & Chilled">Dairy & Chilled</option>
+            <option value="Tins & Jars">Tins & Jars</option>
+            <option value="Dry Goods & Grains">Dry Goods & Grains</option>
+            <option value="Spices & Condiments">Spices & Condiments</option>
+            <option value="Bakery">Bakery</option>
+            <option value="Frozen">Frozen</option>
+            <option value="Drinks & Household">Drinks & Household</option>
+          </select>
+
+          <!-- Target List Selector -->
+          <select
+            id="quick-add-list"
+            aria-label="Target Grocery List"
+            style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);"
+            class="flex-1 sm:w-44 px-3 py-2.5 rounded-xl border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+          >
+            <!-- Populated dynamically via JS -->
+          </select>
+
+          <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 active:scale-[0.99] text-white dark:text-slate-950 font-bold text-sm transition shrink-0">
+            + Add
+          </button>
+        </div>
+      </form>
+
+      <!-- Active Shopping Items Container -->
+      <div id="grocery-items-container" class="space-y-4">
+        <!-- Populated dynamically via JS -->
+      </div>
+
+      <!-- Checked / In Trolley Section -->
+      <div id="grocery-checked-container">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 2: RECIPES                                                     -->
+    <!-- =================================================================== -->
+    <section id="tab-recipes" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 style="color: var(--text-primary);" class="text-2xl font-extrabold tracking-tight">Household Recipes</h2>
+          <p style="color: var(--text-muted);" class="text-sm">
+            Tap any recipe to scale portions and route ingredients to Personal or Shared lists.
+          </p>
+        </div>
+
+        <button onclick="openRecipeFormModal()" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 active:scale-[0.99] text-white dark:text-slate-950 font-bold text-sm shadow-md shadow-emerald-500/15 transition shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>New Recipe</span>
+        </button>
+      </div>
+
+      <!-- Search & Tag Filters -->
+      <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="p-4 rounded-2xl border space-y-3">
+        <div class="relative">
+          <svg style="color: var(--text-muted);" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            id="recipe-search"
+            oninput="renderRecipes()"
+            style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);"
+            placeholder="Search recipes by title, tag, or ingredient (e.g. salmon, katsu, paprika)..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition"
+          />
+        </div>
+
+        <div id="recipe-tags-bar" class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Recipe Cards Grid -->
+      <div id="recipes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 3: WEEKLY MEAL PLANNER                                         -->
+    <!-- =================================================================== -->
+    <section id="tab-planner" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 style="color: var(--text-primary);" class="text-2xl font-extrabold tracking-tight">Weekly Meal Plan</h2>
+          <p style="color: var(--text-muted);" class="text-sm">
+            Stack Personal & Shared meals across Mon–Sun and smart-route ingredients to your lists.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            onclick="clearMealPlan()"
+            style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary);"
+            class="px-3.5 py-2.5 rounded-xl border hover:border-rose-500/40 text-xs font-semibold transition"
+          >
+            Reset Week
+          </button>
+          <button onclick="openGenerateWeekModal()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-sm shadow-md shadow-emerald-500/15 flex items-center gap-2 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span>Generate Week's Shopping List</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 7-Day Planner Grid -->
+      <div id="meal-plan-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 4: PANTRY INVENTORY                                            -->
+    <!-- =================================================================== -->
+    <section id="tab-pantry" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 style="color: var(--text-primary);" class="text-2xl font-extrabold tracking-tight">Kitchen Pantry</h2>
+          <p style="color: var(--text-muted);" class="text-sm">
+            Items here automatically calculate Recipe Match % and pre-uncheck when sending recipes to your shopping lists.
+          </p>
+        </div>
+      </div>
+
+      <!-- Add Staple & Search Bar -->
+      <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="p-4 rounded-2xl border grid grid-cols-1 md:grid-cols-2 gap-3">
+        <form onsubmit="handleAddPantryItem(event)" class="flex gap-2">
+          <input
+            type="text"
+            id="pantry-add-input"
+            style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);"
+            placeholder="Add staple to pantry (e.g. Coconut Milk, Paprika)..."
+            class="flex-1 px-3.5 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
+            required
+          />
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-sm transition shrink-0">
+            Add Staple
+          </button>
+        </form>
+
+        <div class="relative">
+          <svg style="color: var(--text-muted);" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            id="pantry-search-input"
+            oninput="renderPantry()"
+            style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);"
+            placeholder="Filter pantry items..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
+          />
+        </div>
+      </div>
+
+      <!-- Pantry Items Grid -->
+      <div id="pantry-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION BAR                                          -->
+  <!-- ===================================================================== -->
+  <nav style="background-color: var(--bg-header); border-color: var(--border-subtle);" class="md:hidden fixed bottom-0 inset-x-0 z-30 backdrop-blur-md border-t px-2 py-1.5 flex items-center justify-around">
+    <button onclick="switchTab('grocery')" data-tab="grocery" class="nav-tab-mobile relative flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition">
+      <div class="relative">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <span id="badge-grocery-mobile" class="absolute -top-1.5 -right-2.5 px-1.5 min-w-[18px] h-[18px] rounded-full bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 text-[10px] font-extrabold flex items-center justify-center">0</span>
+      </div>
+      <span>Lists</span>
+    </button>
+
+    <button onclick="switchTab('recipes')" data-tab="recipes" class="nav-tab-mobile flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+      <span>Recipes</span>
+    </button>
+
+    <button onclick="switchTab('planner')" data-tab="planner" class="nav-tab-mobile flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <span>Meal Plan</span>
+    </button>
+
+    <button onclick="switchTab('pantry')" data-tab="pantry" class="nav-tab-mobile flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      <span>Pantry</span>
+    </button>
+  </nav>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: CREATE NEW CUSTOM GROCERY LIST                               -->
+  <!-- ===================================================================== -->
+  <div id="new-list-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-4">
+    <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-md mx-auto rounded-3xl border shadow-2xl overflow-hidden my-10">
+      <div style="border-color: var(--border-subtle);" class="px-6 py-4 border-b flex items-center justify-between">
+        <h3 style="color: var(--text-primary);" class="text-lg font-bold">Create Custom Grocery List</h3>
+        <button onclick="closeModal('new-list-modal')" style="color: var(--text-muted);" class="p-2 rounded-xl hover:bg-slate-500/10">✕</button>
+      </div>
+
+      <form onsubmit="handleCreateCustomList(event)" class="p-6 space-y-4">
+        <div>
+          <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">List Name *</label>
+          <input type="text" id="new-list-name" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="e.g. Bulk / Costco, Weekend BBQ, Bakery Run..." class="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+        </div>
+
+        <div>
+          <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Description</label>
+          <input type="text" id="new-list-desc" style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="e.g. Monthly bulk essentials & drinks" class="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+        </div>
+
+        <div>
+          <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Badge Color</label>
+          <div class="grid grid-cols-5 gap-2" id="new-list-colors">
+            <label class="cursor-pointer">
+              <input type="radio" name="listColor" value="amber" checked class="sr-only peer" />
+              <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="py-2 rounded-xl text-center text-xs font-bold border text-amber-600 dark:text-amber-400 peer-checked:border-amber-500 peer-checked:bg-amber-500/15">Amber</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="listColor" value="violet" class="sr-only peer" />
+              <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="py-2 rounded-xl text-center text-xs font-bold border text-violet-600 dark:text-violet-400 peer-checked:border-violet-500 peer-checked:bg-violet-500/15">Violet</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="listColor" value="rose" class="sr-only peer" />
+              <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="py-2 rounded-xl text-center text-xs font-bold border text-rose-600 dark:text-rose-400 peer-checked:border-rose-500 peer-checked:bg-rose-500/15">Rose</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="listColor" value="indigo" class="sr-only peer" />
+              <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="py-2 rounded-xl text-center text-xs font-bold border text-indigo-600 dark:text-indigo-400 peer-checked:border-indigo-500 peer-checked:bg-indigo-500/15">Indigo</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="listColor" value="emerald" class="sr-only peer" />
+              <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="py-2 rounded-xl text-center text-xs font-bold border text-emerald-600 dark:text-emerald-400 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15">Emerald</div>
+            </label>
+          </div>
+        </div>
+
+        <div style="border-color: var(--border-subtle);" class="flex items-center justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeModal('new-list-modal')" style="border-color: var(--border-subtle); color: var(--text-secondary);" class="px-4 py-2 rounded-xl border text-xs font-semibold hover:bg-slate-500/10">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-xs font-bold">Create List</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: RECIPE DETAIL & MULTI-LIST INGREDIENT ROUTER                 -->
+  <!-- ===================================================================== -->
+  <div id="recipe-detail-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
+    <div id="recipe-detail-content" style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-4xl mx-auto rounded-3xl border shadow-2xl overflow-hidden my-4">
+      <!-- Populated dynamically via JS -->
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: ADD / EDIT RECIPE WITH QUICK-PASTE PARSER                    -->
+  <!-- ===================================================================== -->
+  <div id="recipe-form-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
+    <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-2xl mx-auto rounded-3xl border shadow-2xl overflow-hidden my-4">
+      <div style="border-color: var(--border-subtle);" class="px-6 py-4 border-b flex items-center justify-between">
+        <h3 id="recipe-form-title" style="color: var(--text-primary);" class="text-lg font-bold">Add New Recipe</h3>
+        <button onclick="closeModal('recipe-form-modal')" style="color: var(--text-muted);" class="p-2 rounded-xl hover:bg-slate-500/10">✕</button>
+      </div>
+
+      <form onsubmit="saveRecipeForm(event)" class="p-6 space-y-5">
+        <input type="hidden" id="edit-recipe-id" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <div class="sm:col-span-2">
+            <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Recipe Title *</label>
+            <input type="text" id="form-recipe-title" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="e.g. Spicy Prawn Linguine" class="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+          </div>
+          <div>
+            <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Servings *</label>
+            <input type="number" id="form-recipe-servings" min="1" max="24" value="4" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" class="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+          </div>
+          <div>
+            <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Prep / Cook</label>
+            <input type="text" id="form-recipe-time" value="30 mins" style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="30 mins" class="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+          </div>
+        </div>
+
+        <div>
+          <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Tags (comma-separated)</label>
+          <input type="text" id="form-recipe-tags" style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="Quick, Batch Cook, High Protein" class="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+        </div>
+
+        <!-- Quick Paste Ingredients Parser -->
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-4 rounded-2xl border space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Quick Paste Ingredients Parser</span>
+            <button type="button" onclick="parseQuickPasteIngredients()" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold transition">
+              Parse Lines ↓
+            </button>
+          </div>
+          <textarea id="quick-paste-textarea" rows="3" style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="Paste one ingredient per line, e.g.:&#10;400g chicken breast&#10;1 tin chickpeas&#10;2 tbsp curry powder" class="w-full px-3 py-2 rounded-xl border text-xs placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"></textarea>
+        </div>
+
+        <!-- Structured Ingredient Rows -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label style="color: var(--text-muted);" class="text-xs font-bold uppercase tracking-wider">Ingredients</label>
+            <button type="button" onclick="addFormIngredientRow()" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+              + Add Row
+            </button>
+          </div>
+          <div id="form-ingredients-list" class="space-y-2">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Method Steps -->
+        <div>
+          <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Method Steps (one step per line)</label>
+          <textarea id="form-recipe-steps" rows="4" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="Fry onions until soft...&#10;Add spices and stir for 1 minute..." class="w-full px-3.5 py-2.5 rounded-xl border text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"></textarea>
+        </div>
+
+        <div style="border-color: var(--border-subtle);" class="flex items-center justify-end gap-2.5 pt-3 border-t">
+          <button type="button" onclick="closeModal('recipe-form-modal')" style="border-color: var(--border-subtle); color: var(--text-secondary);" class="px-4 py-2.5 rounded-xl border text-xs font-semibold hover:bg-slate-500/10">Cancel</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-xs font-bold">Save Recipe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: ADD / EDIT DAY MEAL (PERSONAL VS SHARED SCOPE)               -->
+  <!-- ===================================================================== -->
+  <div id="meal-slot-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
+    <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-lg mx-auto rounded-3xl border shadow-2xl overflow-hidden my-6">
+      <div style="border-color: var(--border-subtle);" class="px-6 py-4 border-b flex items-center justify-between">
+        <div>
+          <h3 id="meal-slot-modal-title" style="color: var(--text-primary);" class="text-lg font-bold">Plan Meal for Monday</h3>
+          <p style="color: var(--text-muted);" class="text-xs">Tag as Personal or Shared so groceries auto-route cleanly</p>
+        </div>
+        <button onclick="closeModal('meal-slot-modal')" style="color: var(--text-muted);" class="p-2 rounded-xl hover:bg-slate-500/10">✕</button>
+      </div>
+
+      <div class="p-6 space-y-5">
+        <input type="hidden" id="meal-slot-day" />
+        <input type="hidden" id="meal-slot-edit-id" />
+
+        <!-- Meal Scope Selector: Personal vs Shared -->
+        <div>
+          <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Who is this meal for?</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <label class="cursor-pointer">
+              <input type="radio" name="mealScope" value="personal" checked class="sr-only peer" />
+              <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="p-3 rounded-xl border peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                <div>
+                  <div style="color: var(--text-primary);" class="text-xs font-bold">Personal</div>
+                  <div style="color: var(--text-muted);" class="text-[11px]">Solo meal</div>
+                </div>
+              </div>
+            </label>
+
+            <label class="cursor-pointer">
+              <input type="radio" name="mealScope" value="shared" class="sr-only peer" />
+              <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="p-3 rounded-xl border peer-checked:border-indigo-500 peer-checked:bg-indigo-500/10 transition flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0"></span>
+                <div>
+                  <div style="color: var(--text-primary);" class="text-xs font-bold">Shared Household</div>
+                  <div style="color: var(--text-muted);" class="text-[11px]">Cooking together</div>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Mode Toggle: Saved Recipe vs Custom / Quick Meal -->
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="grid grid-cols-2 p-1 rounded-xl border">
+          <button type="button" id="toggle-mode-recipe" onclick="setMealSlotMode('recipe')" class="py-2 px-3 rounded-lg text-xs font-bold transition">
+            Saved Recipe
+          </button>
+          <button type="button" id="toggle-mode-custom" onclick="setMealSlotMode('custom')" class="py-2 px-3 rounded-lg text-xs font-bold transition">
+            Custom / Quick Meal
+          </button>
+        </div>
+
+        <!-- Optional Meal Label -->
+        <div>
+          <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Meal Time / Label</label>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="document.getElementById('meal-slot-label').value='Dinner'" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="px-2.5 py-1 rounded-lg text-xs font-semibold hover:opacity-80">Dinner</button>
+            <button type="button" onclick="document.getElementById('meal-slot-label').value='Lunch'" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="px-2.5 py-1 rounded-lg text-xs font-semibold hover:opacity-80">Lunch</button>
+            <button type="button" onclick="document.getElementById('meal-slot-label').value='Breakfast'" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="px-2.5 py-1 rounded-lg text-xs font-semibold hover:opacity-80">Breakfast</button>
+            <input type="text" id="meal-slot-label" value="Dinner" style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="e.g. Dinner, Lunch..." class="flex-1 min-w-[120px] px-3 py-1 rounded-lg border text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+          </div>
+        </div>
+
+        <!-- MODE A: SAVED RECIPE -->
+        <form id="form-slot-recipe" onsubmit="saveRecipeMealSlot(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Select Recipe *</label>
+              <select id="slot-recipe-select" onchange="syncSlotRecipeDefaultServings()" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" class="w-full px-3.5 py-2.5 rounded-xl border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Servings</label>
+              <input type="number" id="slot-recipe-servings" min="1" max="20" value="2" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" class="w-full px-3.5 py-2.5 rounded-xl border text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+            </div>
+          </div>
+
+          <div style="border-color: var(--border-subtle);" class="flex items-center justify-end gap-2 pt-3 border-t">
+            <button type="button" onclick="closeModal('meal-slot-modal')" style="border-color: var(--border-subtle); color: var(--text-secondary);" class="px-4 py-2 rounded-xl border text-xs font-semibold hover:bg-slate-500/10">Cancel</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-xs font-bold">Add Recipe to Day</button>
+          </div>
+        </form>
+
+        <!-- MODE B: CUSTOM / QUICK MEAL -->
+        <form id="form-slot-custom" onsubmit="saveCustomMealSlot(event)" class="hidden space-y-4">
+          <div class="space-y-1.5">
+            <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider">One-Tap Presets</label>
+            <div id="custom-meal-presets" class="flex flex-wrap gap-1.5">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <div>
+            <label style="color: var(--text-muted);" class="block text-xs font-bold uppercase tracking-wider mb-1.5">Custom Meal Name *</label>
+            <input type="text" id="slot-custom-title" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="e.g. Quick Instant Ramen, Ready Meal, Leftovers..." class="w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+          </div>
+
+          <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-3.5 rounded-2xl border space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-amber-600 dark:text-amber-400">Quick Grocery Items (Optional)</label>
+              <span style="color: var(--text-muted);" class="text-[11px]">Comma-separated</span>
+            </div>
+            <input type="text" id="slot-custom-items" style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);" placeholder="e.g. 1 pack instant ramen, 2 eggs" class="w-full px-3 py-2 rounded-xl border text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+          </div>
+
+          <div style="border-color: var(--border-subtle);" class="flex items-center justify-end gap-2 pt-3 border-t">
+            <button type="button" onclick="closeModal('meal-slot-modal')" style="border-color: var(--border-subtle); color: var(--text-secondary);" class="px-4 py-2 rounded-xl border text-xs font-semibold hover:bg-slate-500/10">Cancel</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold">Save Custom Meal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 5: GENERATE WEEK'S SHOPPING LIST (SMART ROUTE BY MEAL TAG)      -->
+  <!-- ===================================================================== -->
+  <div id="generate-week-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-4">
+    <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-md mx-auto rounded-3xl border shadow-2xl overflow-hidden my-10">
+      <div style="border-color: var(--border-subtle);" class="px-6 py-4 border-b flex items-center justify-between">
+        <h3 style="color: var(--text-primary);" class="text-lg font-bold">Generate Week's Shopping List</h3>
+        <button onclick="closeModal('generate-week-modal')" style="color: var(--text-muted);" class="p-2 rounded-xl hover:bg-slate-500/10">✕</button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <p id="generate-week-summary" style="color: var(--text-secondary);" class="text-xs leading-relaxed">
+          <!-- Populated dynamically -->
+        </p>
+
+        <div class="space-y-2.5">
+          <label class="cursor-pointer block">
+            <input type="radio" name="weekRouteMode" value="smart" checked onchange="toggleWeekOverrideSelect()" class="sr-only peer" />
+            <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="p-3.5 rounded-2xl border peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition space-y-1">
+              <div class="flex items-center justify-between">
+                <span style="color: var(--text-primary);" class="text-xs font-bold">Smart Route by Meal Tag (Recommended)</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">Auto-Split</span>
+              </div>
+              <p style="color: var(--text-muted);" class="text-[11px]">
+                Sends <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Personal</span> meals to Personal list & <span class="text-indigo-600 dark:text-indigo-400 font-semibold">Shared</span> meals to Shared Household list.
+              </p>
+            </div>
+          </label>
+
+          <label class="cursor-pointer block">
+            <input type="radio" name="weekRouteMode" value="single" onchange="toggleWeekOverrideSelect()" class="sr-only peer" />
+            <div style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="p-3.5 rounded-2xl border peer-checked:border-indigo-500 peer-checked:bg-indigo-500/10 transition space-y-2">
+              <div style="color: var(--text-primary);" class="text-xs font-bold">Override: Send All to a Single List</div>
+              <select id="week-override-list-select" disabled style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);" class="w-full px-3 py-2 rounded-xl border text-xs font-semibold disabled:opacity-50">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </label>
+        </div>
+
+        <label style="background-color: var(--bg-input); border-color: var(--border-subtle);" class="flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer">
+          <input type="checkbox" id="week-skip-pantry" checked class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500" />
+          <span style="color: var(--text-secondary);" class="text-xs font-medium">Skip ingredients already in my Pantry</span>
+        </label>
+
+        <div style="border-color: var(--border-subtle);" class="flex items-center justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeModal('generate-week-modal')" style="border-color: var(--border-subtle); color: var(--text-secondary);" class="px-4 py-2 rounded-xl border text-xs font-semibold hover:bg-slate-500/10">Cancel</button>
+          <button type="button" onclick="executeGenerateWeekShoppingList()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-xs font-bold">
+            Route & Merge Ingredients
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 6: HOUSEHOLD SYNC & FIRESTORE ARCHITECTURE INFO                 -->
+  <!-- ===================================================================== -->
+  <div id="sync-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-4">
+    <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-xl mx-auto rounded-3xl border shadow-2xl overflow-hidden my-6">
+      <div style="border-color: var(--border-subtle);" class="px-6 py-4 border-b flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+          <h3 style="color: var(--text-primary);" class="text-lg font-bold">Household Sync & Firestore Model</h3>
+        </div>
+        <button onclick="closeModal('sync-modal')" style="color: var(--text-muted);" class="p-2 rounded-xl hover:bg-slate-500/10">✕</button>
+      </div>
+
+      <div style="color: var(--text-secondary);" class="p-6 space-y-5 text-xs">
+        <p style="color: var(--text-muted);" class="leading-relaxed">
+          KitchenSync separates private solo lists from real-time shared flatmate lists using dual Firestore collection paths, currently persisted locally in <code class="text-emerald-600 dark:text-emerald-400 font-mono">kitchensync_*</code> keys:
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div style="background-color: var(--bg-surface-elevated);" class="p-3.5 rounded-2xl border border-emerald-500/35 space-y-1.5">
+            <div class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <span>●</span> Personal Lists Path
+            </div>
+            <code style="background-color: var(--bg-surface); color: var(--text-primary);" class="block text-[11px] font-mono px-2 py-1 rounded-lg">
+              users/{uid}/lists/{listId}
+            </code>
+            <p style="color: var(--text-muted);" class="text-[11px]">Private security rules: only readable and writable by your Firebase Auth UID.</p>
+          </div>
+
+          <div style="background-color: var(--bg-surface-elevated);" class="p-3.5 rounded-2xl border border-indigo-500/35 space-y-1.5">
+            <div class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+              <span>●</span> Shared Household Path
+            </div>
+            <code style="background-color: var(--bg-surface); color: var(--text-primary);" class="block text-[11px] font-mono px-2 py-1 rounded-lg">
+              households/{id}/lists/{listId}
+            </code>
+            <p style="color: var(--text-muted);" class="text-[11px]">Real-time <code class="text-indigo-600 dark:text-indigo-300">onSnapshot</code> sync across all housemates in the household.</p>
+          </div>
+        </div>
+
+        <!-- Simulated Housemate Invite Link -->
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-4 rounded-2xl border space-y-2">
+          <div style="color: var(--text-primary);" class="font-bold">Housemate Invite Code (Preview)</div>
+          <div class="flex items-center gap-2">
+            <input type="text" readonly value="https://kitchensync.web.app/join/FLAT-4B-SYNC" id="invite-link-input" style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="flex-1 px-3 py-2 rounded-xl border font-mono text-[11px] text-indigo-600 dark:text-indigo-300" />
+            <button type="button" onclick="copyInviteLink()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shrink-0">
+              Copy Invite
+            </button>
+          </div>
+        </div>
+
+        <!-- Backup & Restore -->
+        <div style="border-color: var(--border-subtle);" class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t">
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="exportBackupJSON()" style="background-color: var(--bg-surface-elevated); color: var(--text-primary);" class="px-3.5 py-2 rounded-xl font-semibold hover:opacity-85">
+              Export JSON Backup
+            </button>
+            <label style="background-color: var(--bg-surface-elevated); color: var(--text-primary);" class="px-3.5 py-2 rounded-xl font-semibold cursor-pointer hover:opacity-85">
+              Import JSON
+              <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden" />
+            </label>
+          </div>
+          <button type="button" onclick="closeModal('sync-modal')" class="px-4 py-2 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 font-bold">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT APPLICATION: THEME ENGINE + FIRESTORE-READY MULTI-LIST     -->
+  <!-- ===================================================================== -->
+  <script>
+    /**
+     * =========================================================================
+     * 1. THEME CONTROLLER (LIGHT / DARK / SYSTEM + LIVE OS MATCHMEDIA + PWA)
+     * =========================================================================
+     */
+    const THEME_STORAGE_KEY = 'kitchensync_theme';
+    let currentThemeMode = 'system'; // 'light' | 'dark' | 'system'
+    let activeManifestBlobUrl = null;
+    const osDarkMediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+    function getEffectiveTheme(mode) {
+      if (mode === 'light') return 'light';
+      if (mode === 'dark') return 'dark';
+      return osDarkMediaQuery && osDarkMediaQuery.matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(mode) {
+      currentThemeMode = ['light', 'dark', 'system'].includes(mode) ? mode : 'system';
+      const effective = getEffectiveTheme(currentThemeMode);
+      const isDark = effective === 'dark';
+
+      document.documentElement.classList.toggle('dark', isDark);
+
+      // Update <meta name="theme-color">
+      const themeHex = isDark ? '#020617' : '#fafaf9';
+      const metaTheme = document.getElementById('meta-theme-color');
+      if (metaTheme) metaTheme.setAttribute('content', themeHex);
+
+      // Update dynamic Blob PWA manifest with matching theme/background colors
+      updateDynamicPWAManifest(themeHex);
+
+      // Update 3-way segmented control active states & ARIA attributes
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        const isSelected = btn.dataset.themeOption === currentThemeMode;
+        btn.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+        if (isSelected) {
+          btn.style.backgroundColor = 'var(--bg-surface)';
+          btn.style.color = 'var(--text-primary)';
+          btn.style.boxShadow = 'var(--shadow-card)';
+        } else {
+          btn.style.backgroundColor = 'transparent';
+          btn.style.color = 'var(--text-muted)';
+          btn.style.boxShadow = 'none';
+        }
+      });
+    }
+
+    function setThemeMode(mode) {
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, mode);
+      } catch (e) {}
+      applyTheme(mode);
+    }
+
+    function initThemeSystem() {
+      let savedMode = 'system';
+      try {
+        savedMode = localStorage.getItem(THEME_STORAGE_KEY) || 'system';
+      } catch (e) {}
+
+      applyTheme(savedMode);
+
+      // Listen live to OS dark/light preference changes when set to 'system'
+      if (osDarkMediaQuery) {
+        const onSystemThemeChange = () => {
+          if (currentThemeMode === 'system') {
+            applyTheme('system');
+          }
+        };
+        if (typeof osDarkMediaQuery.addEventListener === 'function') {
+          osDarkMediaQuery.addEventListener('change', onSystemThemeChange);
+        } else if (typeof osDarkMediaQuery.addListener === 'function') {
+          osDarkMediaQuery.addListener(onSystemThemeChange);
+        }
+      }
+    }
+
+    function updateDynamicPWAManifest(themeColorHex) {
+      try {
+        if (activeManifestBlobUrl) {
+          URL.revokeObjectURL(activeManifestBlobUrl);
+        }
+        const manifest = {
+          name: 'KitchenSync',
+          short_name: 'KitchenSync',
+          description: 'Recipes, Meal Plan & Smart Grocery Lists',
+          start_url: '.',
+          display: 'standalone',
+          background_color: themeColorHex,
+          theme_color: themeColorHex
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+        activeManifestBlobUrl = URL.createObjectURL(blob);
+        const link = document.getElementById('pwa-manifest');
+        if (link) link.href = activeManifestBlobUrl;
+      } catch (err) {
+        console.warn('PWA manifest update skipped:', err);
+      }
+    }
+
+    /**
+     * =========================================================================
+     * 2. CONSTANTS, UK SUPERMARKET AISLES & DEFAULT SEED DATA
+     * =========================================================================
+     */
+    const AISLES = [
+      'Produce',
+      'Meat & Fish',
+      'Dairy & Chilled',
+      'Tins & Jars',
+      'Dry Goods & Grains',
+      'Spices & Condiments',
+      'Bakery',
+      'Frozen',
+      'Drinks & Household'
+    ];
+
+    const LEGACY_AISLE_MAP = {
+      'Dairy & Eggs': 'Dairy & Chilled',
+      'Cupboard & Tins': 'Tins & Jars',
+      'Bakery & Grains': 'Dry Goods & Grains',
+      'Drinks & Snacks': 'Drinks & Household'
+    };
+
+    function normalizeAisle(aisle, itemName = '') {
+      if (AISLES.includes(aisle)) return aisle;
+      if (LEGACY_AISLE_MAP[aisle]) return LEGACY_AISLE_MAP[aisle];
+      return detectAisle(itemName);
+    }
+
+    const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    const CORE_LISTS = [
+      {
+        id: 'personal',
+        name: 'Personal',
+        type: 'personal',
+        icon: 'user',
+        color: 'emerald',
+        description: 'Solo weekday meals & personal items'
+      },
+      {
+        id: 'shared',
+        name: 'Shared Household',
+        type: 'shared',
+        icon: 'users',
+        color: 'indigo',
+        description: 'Collective drinks, bulk tins & shared meals'
+      }
+    ];
+
+    const SEED_SHOPPING_ITEMS = [
+      {
+        id: 'seed_item_1',
+        listId: 'personal',
+        name: 'Salmon Fillets',
+        qty: 2,
+        unit: 'pcs',
+        aisle: 'Meat & Fish',
+        checked: false,
+        sources: []
+      },
+      {
+        id: 'seed_item_2',
+        listId: 'personal',
+        name: 'Chicken Breast',
+        qty: 250,
+        unit: 'g',
+        aisle: 'Meat & Fish',
+        checked: false,
+        sources: []
+      },
+      {
+        id: 'seed_item_3',
+        listId: 'personal',
+        name: 'Instant Ramen',
+        qty: 1,
+        unit: 'pack',
+        aisle: 'Dry Goods & Grains',
+        checked: false,
+        sources: ['Wed Lunch']
+      },
+      {
+        id: 'seed_item_4',
+        listId: 'shared',
+        name: 'Chopped Tomatoes',
+        qty: 4,
+        unit: 'tin',
+        aisle: 'Tins & Jars',
+        checked: false,
+        sources: ['Bulk Staple']
+      },
+      {
+        id: 'seed_item_5',
+        listId: 'shared',
+        name: 'Oat Milk',
+        qty: 2,
+        unit: 'l',
+        aisle: 'Dairy & Chilled',
+        checked: false,
+        sources: ['Household']
+      },
+      {
+        id: 'seed_item_6',
+        listId: 'shared',
+        name: 'Sparkling Water',
+        qty: 6,
+        unit: 'can',
+        aisle: 'Drinks & Household',
+        checked: false,
+        sources: ['Household']
+      },
+      {
+        id: 'seed_item_7',
+        listId: 'shared',
+        name: 'Olive Oil',
+        qty: 1000,
+        unit: 'ml',
+        aisle: 'Tins & Jars',
+        checked: false,
+        sources: ['Household']
+      },
+      {
+        id: 'seed_item_8',
+        listId: 'shared',
+        name: 'Basmati Rice',
+        qty: 1000,
+        unit: 'g',
+        aisle: 'Dry Goods & Grains',
+        checked: false,
+        sources: ['Bulk Staple']
+      }
+    ];
+
+    const SEED_PANTRY = [
+      'Basmati Rice',
+      'Jasmine Rice',
+      'Soy Sauce',
+      'Olive Oil',
+      'Garlic',
+      'Medium Curry Powder',
+      'Smoked Paprika',
+      'Black Pepper',
+      'Salt'
+    ];
+
+    const SEED_RECIPES = [
+      {
+        id: 'rec_katsu_01',
+        title: 'Chicken & Chickpea Katsu Curry',
+        servings: 4,
+        prepTime: '40 mins',
+        tags: ['Batch Cook', 'Comfort'],
+        ingredients: [
+          { name: 'Chicken breast fillets', amount: 500, unit: 'g', aisle: 'Meat & Fish' },
+          { name: 'Chickpeas', amount: 1, unit: 'tin', aisle: 'Tins & Jars' },
+          { name: 'Brown onion', amount: 150, unit: 'g', aisle: 'Produce' },
+          { name: 'Carrots', amount: 160, unit: 'g', aisle: 'Produce' },
+          { name: 'Garlic', amount: 2, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Medium Curry Powder', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Coconut milk', amount: 400, unit: 'ml', aisle: 'Tins & Jars' },
+          { name: 'Chicken stock', amount: 200, unit: 'ml', aisle: 'Tins & Jars' },
+          { name: 'Panko breadcrumbs', amount: 80, unit: 'g', aisle: 'Dry Goods & Grains' },
+          { name: 'Jasmine Rice', amount: 300, unit: 'g', aisle: 'Dry Goods & Grains' }
+        ],
+        steps: [
+          'Fry finely diced brown onion, grated carrots, and crushed garlic in a saucepan for 8 minutes until softened.',
+          'Stir in medium curry powder for 1 minute, then pour in coconut milk, chicken stock, and drained chickpeas. Simmer gently for 15 minutes.',
+          'Coat flattened chicken breasts in seasoned flour, beaten egg (or milk), and panko breadcrumbs. Bake at 200°C (180°C fan) for 18–20 minutes until golden and crisp.',
+          'Rinse and simmer the jasmine rice according to pack instructions.',
+          'Slice the crispy chicken, ladle over the rich chickpea katsu sauce, and serve alongside steamed rice.'
+        ]
+      },
+      {
+        id: 'rec_gapao_02',
+        title: 'Japanese Gapao Rice (Thai Basil Chicken Mince)',
+        servings: 2,
+        prepTime: '20 mins',
+        tags: ['Quick', 'High Protein'],
+        ingredients: [
+          { name: 'Chicken breast mince', amount: 300, unit: 'g', aisle: 'Meat & Fish' },
+          { name: 'Red bell pepper', amount: 150, unit: 'g', aisle: 'Produce' },
+          { name: 'Garlic', amount: 2, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Red chilli', amount: 1, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Fresh basil leaves', amount: 30, unit: 'g', aisle: 'Produce' },
+          { name: 'Soy Sauce', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Oyster sauce', amount: 1.5, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Eggs', amount: 2, unit: 'pcs', aisle: 'Dairy & Chilled' },
+          { name: 'Jasmine Rice', amount: 160, unit: 'g', aisle: 'Dry Goods & Grains' }
+        ],
+        steps: [
+          'Cook the jasmine rice so it is hot and fluffy when the stir-fry finishes.',
+          'Fry minced garlic and sliced red chilli in 1 tbsp oil over high heat for 30 seconds until fragrant.',
+          'Add chicken mince and stir-fry for 5–6 minutes until browned, breaking up any clumps.',
+          'Toss in finely diced red bell pepper, soy sauce, and oyster sauce. Stir-fry for 2 minutes, then fold through fresh basil leaves until wilted.',
+          'Fry two eggs in a separate pan until crisp-edged with runny yolks, and serve on top of the gapao chicken and rice.'
+        ]
+      },
+      {
+        id: 'rec_salmon_03',
+        title: 'Sweet Chilli Glazed Salmon with Jasmine Rice',
+        servings: 2,
+        prepTime: '25 mins',
+        tags: ['Quick', 'Fish'],
+        ingredients: [
+          { name: 'Salmon Fillets', amount: 2, unit: 'pcs', aisle: 'Meat & Fish' },
+          { name: 'Sweet chilli sauce', amount: 3, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Soy Sauce', amount: 1, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Tenderstem broccoli', amount: 180, unit: 'g', aisle: 'Produce' },
+          { name: 'Spring onions', amount: 40, unit: 'g', aisle: 'Produce' },
+          { name: 'Lime', amount: 1, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Jasmine Rice', amount: 150, unit: 'g', aisle: 'Dry Goods & Grains' }
+        ],
+        steps: [
+          'Preheat the oven to 200°C (180°C fan). Place salmon fillets on a lined baking tray and glaze generously with sweet chilli sauce and soy sauce.',
+          'Roast the salmon for 12–14 minutes until flaky and caramelised.',
+          'Simmer the jasmine rice in salted water for 12 minutes until tender.',
+          'Steam or pan-fry the tenderstem broccoli for 4 minutes until tender-crisp.',
+          'Fluff the rice with lime juice and sliced spring onions, and serve with the glazed salmon and broccoli.'
+        ]
+      },
+      {
+        id: 'rec_goulash_04',
+        title: 'Smoky Sausage & Paprika Goulash',
+        servings: 4,
+        prepTime: '35 mins',
+        tags: ['Batch Cook', 'One-Pot'],
+        ingredients: [
+          { name: 'Pork sausages', amount: 450, unit: 'g', aisle: 'Meat & Fish' },
+          { name: 'Brown onion', amount: 200, unit: 'g', aisle: 'Produce' },
+          { name: 'Red bell pepper', amount: 150, unit: 'g', aisle: 'Produce' },
+          { name: 'Garlic', amount: 3, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Smoked Paprika', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Chopped Tomatoes', amount: 1, unit: 'tin', aisle: 'Tins & Jars' },
+          { name: 'Chicken stock', amount: 250, unit: 'ml', aisle: 'Tins & Jars' },
+          { name: 'Soured cream', amount: 100, unit: 'ml', aisle: 'Dairy & Chilled' },
+          { name: 'Crusty sourdough loaf', amount: 1, unit: 'pcs', aisle: 'Bakery' }
+        ],
+        steps: [
+          'Heat 1 tbsp olive oil in a heavy casserole pot and brown the pork sausages all over for 6–8 minutes. Slice into thick chunks.',
+          'Soften sliced brown onion and diced red bell pepper in the same pot for 6 minutes.',
+          'Stir in crushed garlic and smoked paprika for 1 minute until aromatic.',
+          'Pour in chopped tomatoes, chicken stock, and sliced sausages. Simmer gently for 15 minutes until rich and glossy.',
+          'Swirl through the soured cream off the heat and serve with thick slices of crusty sourdough.'
+        ]
+      }
+    ];
+
+    const CUSTOM_MEAL_PRESETS = [
+      { title: 'Quick Instant Ramen', items: '1 pack instant ramen, 2 eggs, spring onions' },
+      { title: 'Ready Meal', items: '1 chilled ready meal' },
+      { title: 'Leftovers', items: '' },
+      { title: 'Beans on Toast', items: '1 tin baked beans, 1 loaf bread, cheddar cheese' },
+      { title: 'Takeaway / Eating Out', items: '' }
+    ];
+
+    /**
+     * =========================================================================
+     * 3. KITCHENSYNC STORAGE LAYER & AUTOMATIC LEGACY MIGRATION
+     * =========================================================================
+     */
+    class KitchenSyncDB {
+      constructor() {
+        this.prefix = 'kitchensync_';
+      }
+
+      get(key, fallback) {
+        try {
+          const raw = localStorage.getItem(this.prefix + key);
+          return raw !== null ? JSON.parse(raw) : fallback;
+        } catch (err) {
+          console.error(`KitchenSyncDB read error [${key}]:`, err);
+          return fallback;
+        }
+      }
+
+      set(key, value) {
+        try {
+          localStorage.setItem(this.prefix + key, JSON.stringify(value));
+        } catch (err) {
+          console.error(`KitchenSyncDB write error [${key}]:`, err);
+          showToast('Local storage full — consider exporting a JSON backup.', 'error');
+        }
+      }
+
+      /**
+       * One-time migration from `kitchensync_v2_*`, `pantrysync_*`, or `ps_*`
+       * into canonical `kitchensync_*` keys while normalizing UK supermarket aisles.
+       */
+      runMigrationIfNeeded() {
+        if (localStorage.getItem(this.prefix + 'migrated_v3') === 'true') return;
+
+        let migratedLists = null;
+        let migratedRecipes = [];
+        let migratedPantry = [];
+        let migratedMealPlan = {};
+        let migratedItems = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k || k === THEME_STORAGE_KEY) continue;
+
+          if (k.startsWith('kitchensync_v2_') || k.startsWith('pantrysync_') || k.startsWith('ps_')) {
+            try {
+              const parsed = JSON.parse(localStorage.getItem(k));
+              if (k.endsWith('_lists') && Array.isArray(parsed)) {
+                migratedLists = parsed;
+              } else if (k.endsWith('_recipes') && Array.isArray(parsed)) {
+                migratedRecipes = parsed;
+              } else if ((k.endsWith('_pantryStaples') || k.endsWith('_pantry')) && Array.isArray(parsed)) {
+                migratedPantry = parsed;
+              } else if (k.endsWith('_mealPlan') && parsed && typeof parsed === 'object') {
+                migratedMealPlan = parsed;
+              } else if ((k.endsWith('_shoppingList') || k.endsWith('_shoppingItems')) && Array.isArray(parsed)) {
+                migratedItems = parsed;
+              }
+            } catch (_) {}
+          }
+        }
+
+        if (localStorage.getItem(this.prefix + 'lists') === null) {
+          this.set('lists', migratedLists || JSON.parse(JSON.stringify(CORE_LISTS)));
+        }
+
+        if (localStorage.getItem(this.prefix + 'shoppingItems') === null) {
+          if (migratedItems.length > 0) {
+            const converted = migratedItems.map((item, idx) => ({
+              id: item.id || `mig_item_${Date.now()}_${idx}`,
+              listId: item.listId || 'personal',
+              name: item.name || 'Item',
+              qty: Number(item.qty ?? item.amount) || 1,
+              unit: item.unit || 'pcs',
+              aisle: normalizeAisle(item.aisle || item.category, item.name || ''),
+              checked: !!item.checked,
+              sources: Array.isArray(item.sources) ? item.sources : []
+            }));
+            this.set('shoppingItems', converted);
+          } else {
+            this.set('shoppingItems', JSON.parse(JSON.stringify(SEED_SHOPPING_ITEMS)));
+          }
+        }
+
+        if (localStorage.getItem(this.prefix + 'recipes') === null) {
+          const mergedRecipes = JSON.parse(JSON.stringify(SEED_RECIPES));
+          migratedRecipes.forEach(r => {
+            if (r && r.title && !mergedRecipes.some(sr => sr.title.toLowerCase() === r.title.toLowerCase())) {
+              mergedRecipes.push({
+                ...r,
+                ingredients: (r.ingredients || []).map(ing => ({
+                  name: ing.name,
+                  amount: Number(ing.amount) || 1,
+                  unit: ing.unit || 'pcs',
+                  aisle: normalizeAisle(ing.aisle || ing.category, ing.name || '')
+                }))
+              });
+            }
+          });
+          this.set('recipes', mergedRecipes);
+        }
+
+        if (localStorage.getItem(this.prefix + 'pantry') === null) {
+          const combinedPantry = Array.from(new Set([...SEED_PANTRY, ...migratedPantry]));
+          this.set('pantry', combinedPantry);
+        }
+
+        if (localStorage.getItem(this.prefix + 'mealPlan') === null) {
+          const cleanPlan = {};
+          DAYS_OF_WEEK.forEach(day => {
+            const rawDay = migratedMealPlan[day];
+            if (Array.isArray(rawDay)) {
+              cleanPlan[day] = rawDay.map((m, idx) => ({
+                id: m.id || `meal_${day}_${idx}_${Date.now()}`,
+                type: m.type || 'recipe',
+                scope: m.scope === 'shared' ? 'shared' : 'personal',
+                label: m.label || 'Dinner',
+                recipeId: m.recipeId || '',
+                servings: Number(m.servings) || 2,
+                title: m.title || '',
+                groceryItemsRaw: m.groceryItemsRaw || ''
+              }));
+            } else {
+              cleanPlan[day] = [];
+            }
+          });
+          this.set('mealPlan', cleanPlan);
+        }
+
+        localStorage.setItem(this.prefix + 'migrated_v3', 'true');
+      }
+    }
+
+    const db = new KitchenSyncDB();
+
+    /**
+     * =========================================================================
+     * 4. APPLICATION STATE & INITIALIZATION
+     * =========================================================================
+     */
+    let state = {
+      activeTab: 'grocery',
+      activeListId: 'personal',
+      groceryViewMode: 'aisle',
+      selectedRecipeTag: 'All',
+      lists: [],
+      shoppingItems: [],
+      recipes: [],
+      mealPlan: {},
+      pantry: [],
+      activeRecipeDetailId: null,
+      detailMultiplier: 1,
+      detailCheckedSteps: {},
+      detailGlobalListId: 'personal',
+      detailIngListOverrides: {},
+      collapsedAisles: {},
+      openMoveMenuItemId: null
+    };
+
+    function initApp() {
+      initThemeSystem();
+      db.runMigrationIfNeeded();
+
+      state.lists = db.get('lists', CORE_LISTS);
+      state.shoppingItems = db.get('shoppingItems', SEED_SHOPPING_ITEMS).map(i => ({
+        ...i,
+        aisle: normalizeAisle(i.aisle, i.name)
+      }));
+      state.recipes = db.get('recipes', SEED_RECIPES).map(r => ({
+        ...r,
+        ingredients: (r.ingredients || []).map(ing => ({
+          ...ing,
+          aisle: normalizeAisle(ing.aisle, ing.name)
+        }))
+      }));
+      state.pantry = db.get('pantry', SEED_PANTRY);
+      state.mealPlan = db.get('mealPlan', {});
+      DAYS_OF_WEEK.forEach(d => {
+        if (!Array.isArray(state.mealPlan[d])) state.mealPlan[d] = [];
+      });
+
+      document.addEventListener('click', (e) => {
+        if (state.openMoveMenuItemId && !e.target.closest('.move-popover-wrapper')) {
+          state.openMoveMenuItemId = null;
+          renderGroceryView();
+        }
+      });
+
+      updateAllBadges();
+      switchTab('grocery');
+    }
+
+    /**
+     * =========================================================================
+     * 5. NAVIGATION, MODALS & FORMATTING HELPERS
+     * =========================================================================
+     */
+    function switchTab(tab) {
+      state.activeTab = tab;
+      ['grocery', 'recipes', 'planner', 'pantry'].forEach(t => {
+        const section = document.getElementById(`tab-${t}`);
+        if (section) section.classList.toggle('hidden', t !== tab);
+      });
+
+      document.querySelectorAll('.nav-tab-desktop').forEach(btn => {
+        const isActive = btn.dataset.tab === tab;
+        if (isActive) {
+          btn.style.backgroundColor = 'var(--bg-surface)';
+          btn.style.color = 'var(--text-primary)';
+          btn.style.boxShadow = 'var(--shadow-card)';
+        } else {
+          btn.style.backgroundColor = 'transparent';
+          btn.style.color = 'var(--text-muted)';
+          btn.style.boxShadow = 'none';
+        }
+      });
+
+      document.querySelectorAll('.nav-tab-mobile').forEach(btn => {
+        const isActive = btn.dataset.tab === tab;
+        if (isActive) {
+          btn.style.color = 'var(--accent-primary)';
+          btn.classList.add('bg-emerald-500/10', 'font-bold');
+        } else {
+          btn.style.color = 'var(--text-muted)';
+          btn.classList.remove('bg-emerald-500/10', 'font-bold');
+        }
+      });
+
+      if (tab === 'grocery') renderGroceryView();
+      if (tab === 'recipes') renderRecipes();
+      if (tab === 'planner') renderMealPlanner();
+      if (tab === 'pantry') renderPantry();
+    }
+
+    function updateAllBadges() {
+      const unboughtCount = state.shoppingItems.filter(i => !i.checked).length;
+      document.getElementById('badge-grocery-desktop').textContent = unboughtCount;
+      document.getElementById('badge-grocery-mobile').textContent = unboughtCount;
+      document.getElementById('badge-recipes-desktop').textContent = state.recipes.length;
+      document.getElementById('badge-pantry-desktop').textContent = state.pantry.length;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.backgroundColor = 'var(--bg-surface)';
+      toast.style.color = 'var(--text-primary)';
+      toast.style.boxShadow = 'var(--shadow-popover)';
+      const borderClass = type === 'error' ? 'border-rose-500/60' : 'border-emerald-500/50';
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl border text-xs font-semibold flex items-center justify-between gap-3 transition-all duration-300 transform translate-y-2 opacity-0 ${borderClass}`;
+      toast.innerHTML = `
+        <span>${escapeHTML(message)}</span>
+        <span class="${type === 'error' ? 'text-rose-500' : 'text-emerald-600 dark:text-emerald-400'} font-extrabold">${type === 'error' ? '!' : '✓'}</span>
+      `;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function escapeHTML(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatNumber(n) {
+      const num = Number(n);
+      if (isNaN(num)) return String(n);
+      return Number.isInteger(num) ? String(num) : num.toFixed(1).replace(/\.0$/, '');
+    }
+
+    function formatItemQtyUnit(qty, unit) {
+      const u = (unit || 'pcs').toLowerCase();
+      const val = Number(qty) || 1;
+
+      if (u === 'g' && val >= 1000) return `${formatNumber(val / 1000)}kg`;
+      if (u === 'ml' && val >= 1000) return `${formatNumber(val / 1000)}L`;
+      if (u === 'pcs') return `${formatNumber(val)}x`;
+      if (u === 'tin') return `${formatNumber(val)} ${val === 1 ? 'tin' : 'tins'}`;
+      if (u === 'can') return `${formatNumber(val)} ${val === 1 ? 'can' : 'cans'}`;
+      if (u === 'pack') return `${formatNumber(val)} ${val === 1 ? 'pack' : 'packs'}`;
+      if (['tbsp', 'tsp'].includes(u)) return `${formatNumber(val)} ${u}`;
+      return `${formatNumber(val)}${u}`;
+    }
+
+    function getListColorClasses(color) {
+      const map = {
+        emerald: {
+          pillActive: 'bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 border-emerald-500 shadow-md shadow-emerald-500/15',
+          badge: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
+          dot: 'bg-emerald-500'
+        },
+        indigo: {
+          pillActive: 'bg-indigo-600 dark:bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/15',
+          badge: 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
+          dot: 'bg-indigo-500'
+        },
+        sky: {
+          pillActive: 'bg-indigo-600 dark:bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/15',
+          badge: 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
+          dot: 'bg-indigo-500'
+        },
+        amber: {
+          pillActive: 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/15',
+          badge: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+          dot: 'bg-amber-500'
+        },
+        violet: {
+          pillActive: 'bg-violet-600 dark:bg-violet-500 text-white border-violet-500 shadow-md shadow-violet-500/15',
+          badge: 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30',
+          dot: 'bg-violet-500'
+        },
+        rose: {
+          pillActive: 'bg-rose-600 dark:bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-500/15',
+          badge: 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30',
+          dot: 'bg-rose-500'
+        }
+      };
+      return map[color] || map.emerald;
+    }
+
+    /**
+     * =========================================================================
+     * 6. SMART INGREDIENT PARSER, UK AISLE DETECTOR & MERGING ENGINE
+     * =========================================================================
+     */
+    function detectAisle(name) {
+      const n = name.toLowerCase();
+      if (/(onion|garlic|pepper|tomato(?!es)|broccoli|carrot|courgette|lime|lemon|spinach|potato|mushroom|banana|apple|basil|coriander|chilli(?! sauce)|salad|avocado)/.test(n)) return 'Produce';
+      if (/(chicken|beef|pork|sausage|salmon|cod|prawn|bacon|mince|turkey|lamb|steak|fish)/.test(n)) return 'Meat & Fish';
+      if (/(milk|cheese|cream|butter|yogurt|yoghurt|parmesan|cheddar|egg|eggs|ready meal)/.test(n)) return 'Dairy & Chilled';
+      if (/(tin|tinned|chopped tomatoes|chickpea|bean|coconut milk|stock|passata|olive oil|oil|jar|pesto)/.test(n)) return 'Tins & Jars';
+      if (/(rice|pasta|fusilli|spaghetti|flour|panko|breadcrumb|ramen|noodle|oat|cereal|couscous|lentil)/.test(n)) return 'Dry Goods & Grains';
+      if (/(soy sauce|sweet chilli|oyster sauce|curry powder|paprika|salt|pepper|spice|cumin|chilli flakes|vinegar|honey|mustard)/.test(n)) return 'Spices & Condiments';
+      if (/(bread|sourdough|loaf|roll|bun|bagel|wrap|tortilla|naan|croissant|crumpet)/.test(n)) return 'Bakery';
+      if (/(frozen|ice cream|peas)/.test(n)) return 'Frozen';
+      if (/(cola|coke|water|juice|drink|beer|wine|coffee|tea|crisps|chocolate|biscuit|snack|toilet|kitchen roll|bin bag)/.test(n)) return 'Drinks & Household';
+      return 'Tins & Jars';
+    }
+
+    function parseShorthandItem(rawLine) {
+      const cleaned = rawLine.trim();
+      if (!cleaned) return null;
+
+      const match = cleaned.match(/^(\d+(?:\.\d+)?)\s*(kg|g|ml|l|tbsp|tsp|tins?|cans?|packs?|pcs|x)?\b\s*(.+)$/i);
+      let qty = 1;
+      let unit = 'pcs';
+      let name = cleaned;
+
+      if (match) {
+        qty = parseFloat(match[1]);
+        let rawUnit = (match[2] || 'pcs').toLowerCase();
+        if (rawUnit === 'x') rawUnit = 'pcs';
+        if (rawUnit === 'tins') rawUnit = 'tin';
+        if (rawUnit === 'cans') rawUnit = 'can';
+        if (rawUnit === 'packs') rawUnit = 'pack';
+        unit = rawUnit;
+        name = match[3].trim();
+      }
+
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+      return {
+        name,
+        qty,
+        unit,
+        aisle: detectAisle(name)
+      };
+    }
+
+    function normalizeUnitForMerge(qty, unit) {
+      const u = (unit || 'pcs').toLowerCase();
+      if (u === 'kg') return { qty: qty * 1000, unit: 'g' };
+      if (u === 'l') return { qty: qty * 1000, unit: 'ml' };
+      return { qty, unit: u };
+    }
+
+    function mergeItemsIntoList(items, targetListId, defaultSource = null) {
+      const validListId = state.lists.some(l => l.id === targetListId) ? targetListId : 'personal';
+
+      items.forEach(item => {
+        const normName = item.name.trim().toLowerCase();
+        const norm = normalizeUnitForMerge(Number(item.qty ?? item.amount) || 1, item.unit);
+        const sourceTag = item.source || defaultSource;
+
+        const existing = state.shoppingItems.find(ex =>
+          !ex.checked &&
+          ex.listId === validListId &&
+          ex.name.trim().toLowerCase() === normName &&
+          ex.unit === norm.unit
+        );
+
+        if (existing) {
+          existing.qty = Number((existing.qty + norm.qty).toFixed(2));
+          if (sourceTag) {
+            existing.sources = existing.sources || [];
+            if (!existing.sources.includes(sourceTag)) {
+              existing.sources.push(sourceTag);
+            }
+          }
+        } else {
+          state.shoppingItems.push({
+            id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            listId: validListId,
+            name: item.name.trim(),
+            qty: Number(norm.qty.toFixed(2)),
+            unit: norm.unit,
+            aisle: normalizeAisle(item.aisle, item.name),
+            checked: false,
+            sources: sourceTag ? [sourceTag] : []
+          });
+        }
+      });
+
+      db.set('shoppingItems', state.shoppingItems);
+      updateAllBadges();
+    }
+
+    /**
+     * =========================================================================
+     * 7. MULTI-GROCERY LISTS VIEW & CROSS-LIST ACTIONS
+     * =========================================================================
+     */
+    function setActiveList(listId) {
+      state.activeListId = listId;
+      state.openMoveMenuItemId = null;
+      renderGroceryView();
+    }
+
+    function setGroceryViewMode(mode) {
+      state.groceryViewMode = mode;
+      renderGroceryView();
+    }
+
+    function renderGroceryView() {
+      const subtitleEl = document.getElementById('active-list-subtitle');
+      if (state.activeListId === 'all') {
+        subtitleEl.textContent = 'Unified supermarket mode — items across all lists with checkout badges';
+      } else {
+        const currentList = state.lists.find(l => l.id === state.activeListId) || state.lists[0];
+        subtitleEl.textContent = currentList.description || `${currentList.name} grocery items`;
+      }
+
+      const btnAisle = document.getElementById('btn-view-aisle');
+      const btnFlat = document.getElementById('btn-view-flat');
+      [
+        { el: btnAisle, active: state.groceryViewMode === 'aisle' },
+        { el: btnFlat, active: state.groceryViewMode === 'flat' }
+      ].forEach(({ el, active }) => {
+        if (active) {
+          el.style.backgroundColor = 'var(--bg-surface)';
+          el.style.color = 'var(--text-primary)';
+          el.style.boxShadow = 'var(--shadow-card)';
+        } else {
+          el.style.backgroundColor = 'transparent';
+          el.style.color = 'var(--text-muted)';
+          el.style.boxShadow = 'none';
+        }
+      });
+
+      const switcherBar = document.getElementById('list-switcher-bar');
+      const totalUnbought = state.shoppingItems.filter(i => !i.checked).length;
+
+      const listPillsHTML = state.lists.map(list => {
+        const isActive = state.activeListId === list.id;
+        const count = state.shoppingItems.filter(i => !i.checked && i.listId === list.id).length;
+        const colors = getListColorClasses(list.color);
+        const isCore = list.id === 'personal' || list.id === 'shared';
+
+        return `
+          <div class="inline-flex items-center shrink-0">
+            <button
+              onclick="setActiveList('${list.id}')"
+              style="${isActive ? '' : 'background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);'}"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-2 ${isActive ? colors.pillActive : 'hover:border-emerald-500/40'}"
+            >
+              ${list.type === 'shared' ? `
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              ` : `
+                <span class="w-2 h-2 rounded-full ${isActive ? 'bg-white dark:bg-slate-950' : colors.dot}"></span>
+              `}
+              <span>${escapeHTML(list.name)}</span>
+              <span
+                style="${isActive ? '' : 'background-color: var(--bg-surface-elevated); color: var(--text-primary);'}"
+                class="px-1.5 py-0.2 rounded-md text-[11px] font-extrabold ${isActive ? 'bg-black/15' : ''}"
+              >${count}</span>
+            </button>
+            ${!isCore ? `
+              <button onclick="deleteCustomList('${list.id}')" style="color: var(--text-muted);" class="-ml-1.5 pl-2 pr-1.5 py-1.5 hover:text-rose-500 text-xs" title="Delete custom list">
+                ✕
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      const allListsActive = state.activeListId === 'all';
+      switcherBar.innerHTML = `
+        ${listPillsHTML}
+        <button
+          onclick="setActiveList('all')"
+          style="${allListsActive ? '' : 'background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);'}"
+          class="px-3.5 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-2 shrink-0 ${
+            allListsActive ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-900 dark:border-white shadow-md' : 'hover:border-emerald-500/40'
+          }"
+        >
+          <span>All Lists</span>
+          <span
+            style="${allListsActive ? '' : 'background-color: var(--bg-surface-elevated); color: var(--text-primary);'}"
+            class="px-1.5 py-0.2 rounded-md text-[11px] font-extrabold ${allListsActive ? 'bg-white/20 dark:bg-black/15' : ''}"
+          >${totalUnbought}</span>
+        </button>
+
+        <button
+          onclick="openModal('new-list-modal')"
+          style="border-color: var(--border-strong); color: var(--text-muted);"
+          class="px-3 py-2 rounded-xl text-xs font-bold border border-dashed hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition shrink-0"
+        >
+          + New List
+        </button>
+      `;
+
+      const quickListSelect = document.getElementById('quick-add-list');
+      const defaultTarget = state.activeListId === 'all' ? 'personal' : state.activeListId;
+      quickListSelect.innerHTML = state.lists.map(l => `
+        <option value="${l.id}" ${l.id === defaultTarget ? 'selected' : ''}>To: ${escapeHTML(l.name)}</option>
+      `).join('');
+
+      const scopedItems = state.activeListId === 'all'
+        ? state.shoppingItems
+        : state.shoppingItems.filter(i => i.listId === state.activeListId);
+
+      const unboughtItems = scopedItems.filter(i => !i.checked);
+      const checkedItems = scopedItems.filter(i => i.checked);
+
+      const itemsContainer = document.getElementById('grocery-items-container');
+      const checkedContainer = document.getElementById('grocery-checked-container');
+
+      if (unboughtItems.length === 0 && checkedItems.length === 0) {
+        itemsContainer.innerHTML = `
+          <div style="background-color: var(--bg-surface); border-color: var(--border-strong);" class="rounded-2xl border border-dashed p-12 text-center space-y-2.5">
+            <div style="background-color: var(--bg-surface-elevated);" class="w-12 h-12 rounded-2xl text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h3 style="color: var(--text-primary);" class="font-bold text-base">No items on this list yet</h3>
+            <p style="color: var(--text-muted);" class="text-xs max-w-sm mx-auto">
+              Use the quick-add bar above, or send ingredients directly from Recipes or your Weekly Meal Plan.
+            </p>
+          </div>
+        `;
+        checkedContainer.innerHTML = '';
+        return;
+      }
+
+      if (state.groceryViewMode === 'flat') {
+        itemsContainer.innerHTML = unboughtItems.length === 0
+          ? `<div style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-muted);" class="rounded-2xl border p-6 text-center text-xs">Everything on this list is checked off!</div>`
+          : `
+            <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="rounded-2xl border divide-y divide-stone-200/80 dark:divide-slate-800/80 overflow-visible">
+              ${unboughtItems.map(item => renderGroceryItemRow(item)).join('')}
+            </div>
+          `;
+      } else {
+        const grouped = {};
+        AISLES.forEach(a => (grouped[a] = []));
+        unboughtItems.forEach(item => {
+          const aisle = normalizeAisle(item.aisle, item.name);
+          grouped[aisle].push(item);
+        });
+
+        const activeAisles = AISLES.filter(a => grouped[a].length > 0);
+        itemsContainer.innerHTML = activeAisles.length === 0
+          ? `<div style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-muted);" class="rounded-2xl border p-6 text-center text-xs">Everything on this list is checked off!</div>`
+          : activeAisles.map(aisle => {
+            const items = grouped[aisle];
+            const collapsed = !!state.collapsedAisles[aisle];
+            return `
+              <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="rounded-2xl border overflow-visible">
+                <button
+                  onclick="toggleAisleCollapse('${aisle}')"
+                  style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);"
+                  class="w-full px-4 py-3 hover:opacity-95 ${collapsed ? 'rounded-2xl' : 'rounded-t-2xl border-b'} flex items-center justify-between text-left transition"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <span style="color: var(--text-primary);" class="font-bold text-sm">${escapeHTML(aisle)}</span>
+                    <span style="background-color: var(--bg-surface);" class="px-2 py-0.5 rounded-full text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
+                      ${items.length}
+                    </span>
+                  </div>
+                  <svg style="color: var(--text-muted);" class="w-4 h-4 transition-transform ${collapsed ? '-rotate-90' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div class="${collapsed ? 'hidden' : 'divide-y divide-stone-200/80 dark:divide-slate-800/80'}">
+                  ${items.map(item => renderGroceryItemRow(item)).join('')}
+                </div>
+              </div>
+            `;
+          }).join('');
+      }
+
+      if (checkedItems.length > 0) {
+        checkedContainer.innerHTML = `
+          <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="rounded-2xl border overflow-hidden mt-6">
+            <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="px-4 py-3 border-b flex flex-wrap items-center justify-between gap-2">
+              <span style="color: var(--text-muted);" class="text-xs font-bold uppercase tracking-wider">
+                Checked / In Trolley (${checkedItems.length})
+              </span>
+              <div class="flex items-center gap-2">
+                <button onclick="moveCheckedItemsToPantry()" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold transition">
+                  Move Checked to Pantry
+                </button>
+                <button onclick="clearCheckedItems()" style="background-color: var(--bg-surface); color: var(--text-secondary);" class="px-3 py-1.5 rounded-xl hover:bg-rose-500/15 hover:text-rose-600 dark:hover:text-rose-300 text-xs font-semibold transition">
+                  Clear Checked
+                </button>
+              </div>
+            </div>
+
+            <div class="divide-y divide-stone-200/70 dark:divide-slate-800/70">
+              ${checkedItems.map(item => {
+                const listObj = state.lists.find(l => l.id === item.listId) || CORE_LISTS[0];
+                const listBadgeColors = getListColorClasses(listObj.color);
+                return `
+                  <div onclick="toggleItemChecked('${item.id}')" class="px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer opacity-60 hover:opacity-90 transition">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-5 h-5 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 flex items-center justify-center text-xs font-extrabold shrink-0">✓</div>
+                      <span style="color: var(--text-muted);" class="text-sm line-through truncate">
+                        ${escapeHTML(item.name)} <span class="text-xs">(${formatItemQtyUnit(item.qty, item.unit)})</span>
+                      </span>
+                      ${state.activeListId === 'all' ? `
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${listBadgeColors.badge} shrink-0">
+                          ${escapeHTML(listObj.name)}
+                        </span>
+                      ` : ''}
+                    </div>
+                    <span style="color: var(--text-muted);" class="text-[11px] shrink-0">${escapeHTML(item.aisle)}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        checkedContainer.innerHTML = '';
+      }
+    }
+
+    function renderGroceryItemRow(item) {
+      const listObj = state.lists.find(l => l.id === item.listId) || CORE_LISTS[0];
+      const listBadgeColors = getListColorClasses(listObj.color);
+      const formattedQty = formatItemQtyUnit(item.qty, item.unit);
+      const isMoveMenuOpen = state.openMoveMenuItemId === item.id;
+
+      const otherLists = state.lists.filter(l => l.id !== item.listId);
+      const quickTarget = otherLists.length === 1 ? otherLists[0] : null;
+
+      return `
+        <div class="px-4 py-3 flex items-center justify-between gap-3 hover:bg-slate-500/[0.04] transition relative">
+          <div onclick="toggleItemChecked('${item.id}')" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer select-none">
+            <div style="border-color: var(--border-strong);" class="w-5 h-5 rounded-lg border-2 hover:border-emerald-500 flex items-center justify-center shrink-0 transition"></div>
+            <div class="flex flex-wrap items-center gap-2 min-w-0">
+              <span style="color: var(--text-primary);" class="font-bold text-sm">${escapeHTML(item.name)}</span>
+              <span style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="px-2 py-0.5 rounded-md text-xs font-extrabold">
+                ${escapeHTML(formattedQty)}
+              </span>
+
+              ${state.activeListId === 'all' ? `
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${listBadgeColors.badge}">
+                  ${escapeHTML(listObj.name)}
+                </span>
+              ` : ''}
+
+              ${(item.sources || []).map(src => `
+                <span style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle); color: var(--text-muted);" class="px-2 py-0.5 rounded-full text-[10px] font-semibold border">
+                  ${escapeHTML(src)}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0 move-popover-wrapper relative">
+            <button
+              type="button"
+              onclick="handleCrossListMoveClick(event, '${item.id}')"
+              style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle); color: var(--text-secondary);"
+              class="px-2.5 py-1.5 rounded-xl border hover:border-indigo-500/50 hover:text-indigo-600 dark:hover:text-indigo-300 text-xs font-bold flex items-center gap-1 transition"
+              title="${quickTarget ? `Move to ${quickTarget.name}` : 'Move to another list'}"
+            >
+              <span>⇄</span>
+              ${quickTarget ? `<span class="hidden sm:inline text-[11px]">${escapeHTML(quickTarget.id === 'shared' ? 'Shared' : quickTarget.name)}</span>` : ''}
+            </button>
+
+            ${isMoveMenuOpen ? `
+              <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-popover);" class="absolute right-8 top-10 z-30 w-48 rounded-2xl border p-1.5 space-y-1">
+                <div style="color: var(--text-muted);" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">Move item to:</div>
+                ${otherLists.map(target => {
+                  const tc = getListColorClasses(target.color);
+                  return `
+                    <button type="button" onclick="moveItemToList('${item.id}', '${target.id}')" style="color: var(--text-primary);" class="w-full px-2.5 py-2 rounded-xl hover:bg-slate-500/10 text-left text-xs font-bold flex items-center gap-2 transition">
+                      <span class="w-2 h-2 rounded-full ${tc.dot}"></span>
+                      <span class="truncate">${escapeHTML(target.name)}</span>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            ` : ''}
+
+            <button type="button" onclick="deleteShoppingItem('${item.id}')" style="color: var(--text-muted);" class="p-1.5 rounded-xl hover:text-rose-500 hover:bg-slate-500/10 transition" title="Remove item">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function handleQuickAddItem(e) {
+      e.preventDefault();
+      const input = document.getElementById('quick-add-input');
+      const aisleSelect = document.getElementById('quick-add-aisle');
+      const listSelect = document.getElementById('quick-add-list');
+
+      const parsed = parseShorthandItem(input.value);
+      if (!parsed) return;
+
+      if (aisleSelect.value !== 'AUTO') {
+        parsed.aisle = aisleSelect.value;
+      }
+
+      const targetListId = listSelect.value || 'personal';
+      const targetList = state.lists.find(l => l.id === targetListId);
+
+      mergeItemsIntoList([parsed], targetListId, null);
+      input.value = '';
+      renderGroceryView();
+      showToast(`Added "${parsed.name}" to ${targetList ? targetList.name : 'list'}`);
+    }
+
+    function toggleItemChecked(itemId) {
+      const item = state.shoppingItems.find(i => i.id === itemId);
+      if (!item) return;
+      item.checked = !item.checked;
+      db.set('shoppingItems', state.shoppingItems);
+      updateAllBadges();
+      renderGroceryView();
+    }
+
+    function deleteShoppingItem(itemId) {
+      state.shoppingItems = state.shoppingItems.filter(i => i.id !== itemId);
+      db.set('shoppingItems', state.shoppingItems);
+      updateAllBadges();
+      renderGroceryView();
+    }
+
+    function handleCrossListMoveClick(event, itemId) {
+      event.stopPropagation();
+      const item = state.shoppingItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      const otherLists = state.lists.filter(l => l.id !== item.listId);
+      if (otherLists.length === 1) {
+        moveItemToList(itemId, otherLists[0].id);
+      } else {
+        state.openMoveMenuItemId = state.openMoveMenuItemId === itemId ? null : itemId;
+        renderGroceryView();
+      }
+    }
+
+    function moveItemToList(itemId, targetListId) {
+      const idx = state.shoppingItems.findIndex(i => i.id === itemId);
+      if (idx < 0) return;
+
+      const item = state.shoppingItems[idx];
+      const targetList = state.lists.find(l => l.id === targetListId);
+      if (!targetList) return;
+
+      // Remove from current slot and merge into targetListId (so duplicates combine cleanly!)
+      state.shoppingItems.splice(idx, 1);
+      mergeItemsIntoList([{
+        name: item.name,
+        qty: item.qty,
+        unit: item.unit,
+        aisle: item.aisle
+      }], targetListId, null);
+
+      // Preserve any existing source badges on the merged/moved item
+      if (item.sources && item.sources.length > 0) {
+        const normName = item.name.trim().toLowerCase();
+        const norm = normalizeUnitForMerge(item.qty, item.unit);
+        const destItem = state.shoppingItems.find(ex =>
+          !ex.checked && ex.listId === targetListId &&
+          ex.name.trim().toLowerCase() === normName && ex.unit === norm.unit
+        );
+        if (destItem) {
+          destItem.sources = Array.from(new Set([...(destItem.sources || []), ...item.sources]));
+          db.set('shoppingItems', state.shoppingItems);
+        }
+      }
+
+      state.openMoveMenuItemId = null;
+      renderGroceryView();
+      showToast(`Moved "${item.name}" → ${targetList.name}`);
+    }
+
+    function toggleAisleCollapse(aisle) {
+      state.collapsedAisles[aisle] = !state.collapsedAisles[aisle];
+      renderGroceryView();
+    }
+
+    function moveCheckedItemsToPantry() {
+      const checkedInScope = state.shoppingItems.filter(i =>
+        i.checked && (state.activeListId === 'all' || i.listId === state.activeListId)
+      );
+      if (checkedInScope.length === 0) return;
+
+      let addedCount = 0;
+      checkedInScope.forEach(item => {
+        const exists = state.pantry.some(p => p.toLowerCase() === item.name.trim().toLowerCase());
+        if (!exists) {
+          state.pantry.push(item.name.trim());
+          addedCount++;
+        }
+      });
+
+      // Remove those checked items from shoppingItems
+      const idsToRemove = new Set(checkedInScope.map(i => i.id));
+      state.shoppingItems = state.shoppingItems.filter(i => !idsToRemove.has(i.id));
+
+      db.set('pantry', state.pantry);
+      db.set('shoppingItems', state.shoppingItems);
+      updateAllBadges();
+      renderGroceryView();
+      showToast(`Moved ${checkedInScope.length} items to Pantry`);
+    }
+
+    function clearCheckedItems() {
+      const before = state.shoppingItems.length;
+      state.shoppingItems = state.shoppingItems.filter(i =>
+        !(i.checked && (state.activeListId === 'all' || i.listId === state.activeListId))
+      );
+      const removed = before - state.shoppingItems.length;
+      db.set('shoppingItems', state.shoppingItems);
+      updateAllBadges();
+      renderGroceryView();
+      showToast(`Cleared ${removed} checked items`);
+    }
+
+    function copyGroceryListForChat() {
+      const scoped = state.activeListId === 'all'
+        ? state.shoppingItems.filter(i => !i.checked)
+        : state.shoppingItems.filter(i => !i.checked && i.listId === state.activeListId);
+
+      if (scoped.length === 0) {
+        showToast('No unbought items to copy.', 'error');
+        return;
+      }
+
+      const title = state.activeListId === 'all'
+        ? 'KitchenSync — All Grocery Lists'
+        : `KitchenSync — ${(state.lists.find(l => l.id === state.activeListId) || {}).name || 'Grocery List'}`;
+
+      const lines = [`🛒 *${title}*`, ''];
+
+      if (state.groceryViewMode === 'flat') {
+        scoped.forEach(item => {
+          const listSuffix = state.activeListId === 'all'
+            ? ` [${(state.lists.find(l => l.id === item.listId) || {}).name || ''}]`
+            : '';
+          lines.push(`☐ ${item.name} (${formatItemQtyUnit(item.qty, item.unit)})${listSuffix}`);
+        });
+      } else {
+        AISLES.forEach(aisle => {
+          const group = scoped.filter(i => i.aisle === aisle);
+          if (group.length > 0) {
+            lines.push(`*${aisle}*`);
+            group.forEach(item => {
+              const listSuffix = state.activeListId === 'all'
+                ? ` [${(state.lists.find(l => l.id === item.listId) || {}).name || ''}]`
+                : '';
+              lines.push(`☐ ${item.name} (${formatItemQtyUnit(item.qty, item.unit)})${listSuffix}`);
+            });
+            lines.push('');
+          }
+        });
+      }
+
+      copyTextToClipboard(lines.join('\n').trim());
+      showToast('Copied formatted list for WhatsApp / Text!');
+    }
+
+    function handleCreateCustomList(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('new-list-name');
+      const descInput = document.getElementById('new-list-desc');
+      const color = document.querySelector('input[name="listColor"]:checked')?.value || 'amber';
+
+      const name = nameInput.value.trim();
+      if (!name) return;
+
+      const id = `list_${name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${Date.now().toString(36)}`;
+      state.lists.push({
+        id,
+        name,
+        type: 'custom',
+        icon: 'tag',
+        color,
+        description: descInput.value.trim() || `${name} shopping list`
+      });
+
+      db.set('lists', state.lists);
+      nameInput.value = '';
+      descInput.value = '';
+      closeModal('new-list-modal');
+      setActiveList(id);
+      showToast(`Created "${name}" list`);
+    }
+
+    function deleteCustomList(listId) {
+      if (listId === 'personal' || listId === 'shared') return;
+      const target = state.lists.find(l => l.id === listId);
+      if (!target) return;
+
+      // Reassign any orphaned items on that custom list to 'personal' so nothing is lost
+      state.shoppingItems.forEach(item => {
+        if (item.listId === listId) item.listId = 'personal';
+      });
+
+      state.lists = state.lists.filter(l => l.id !== listId);
+      db.set('lists', state.lists);
+      db.set('shoppingItems', state.shoppingItems);
+
+      if (state.activeListId === listId) state.activeListId = 'personal';
+      updateAllBadges();
+      renderGroceryView();
+      showToast(`Deleted "${target.name}" (items moved to Personal)`);
+    }
+
+    /**
+     * =========================================================================
+     * 7. PANTRY INVENTORY & MATCHING HELPERS
+     * =========================================================================
+     */
+    function isIngredientInPantry(ingName) {
+      const needle = ingName.trim().toLowerCase();
+      if (!needle) return false;
+      return state.pantry.some(p => {
+        const hay = p.trim().toLowerCase();
+        if (hay === needle) return true;
+        if (needle.length >= 4 && hay.includes(needle)) return true;
+        if (hay.length >= 4 && needle.includes(hay)) return true;
+        return false;
+      });
+    }
+
+    function calculateRecipePantryMatch(recipe) {
+      const total = (recipe.ingredients || []).length;
+      if (total === 0) return { pct: 0, matched: 0, total: 0 };
+      const matched = recipe.ingredients.filter(i => isIngredientInPantry(i.name)).length;
+      return {
+        pct: Math.round((matched / total) * 100),
+        matched,
+        total
+      };
+    }
+
+    function renderPantry() {
+      const filter = (document.getElementById('pantry-search-input')?.value || '').trim().toLowerCase();
+      const sorted = [...state.pantry]
+        .filter(item => !filter || item.toLowerCase().includes(filter))
+        .sort((a, b) => a.localeCompare(b));
+
+      const grid = document.getElementById('pantry-grid');
+      if (sorted.length === 0) {
+        grid.innerHTML = `
+          <div style="background-color: var(--bg-surface); border-color: var(--border-strong); color: var(--text-muted);" class="col-span-full rounded-2xl border border-dashed p-10 text-center text-xs">
+            No matching pantry items found.
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = sorted.map(item => `
+        <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="px-4 py-3 rounded-2xl border flex items-center justify-between gap-2 hover:border-emerald-500/40 transition">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+            <span style="color: var(--text-primary);" class="text-sm font-semibold truncate">${escapeHTML(item)}</span>
+          </div>
+          <button onclick="removePantryItem('${escapeHTML(item).replace(/'/g, "\\'")}')" style="color: var(--text-muted);" class="p-1.5 rounded-lg hover:text-rose-500 hover:bg-slate-500/10 transition shrink-0" title="Remove from pantry">
+            ✕
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function handleAddPantryItem(e) {
+      e.preventDefault();
+      const input = document.getElementById('pantry-add-input');
+      const raw = input.value.trim();
+      if (!raw) return;
+
+      const formatted = raw.charAt(0).toUpperCase() + raw.slice(1);
+      if (state.pantry.some(p => p.toLowerCase() === formatted.toLowerCase())) {
+        showToast(`"${formatted}" is already in your Pantry`, 'error');
+        return;
+      }
+
+      state.pantry.push(formatted);
+      db.set('pantry', state.pantry);
+      input.value = '';
+      updateAllBadges();
+      renderPantry();
+      showToast(`Added "${formatted}" to Pantry`);
+    }
+
+    function removePantryItem(name) {
+      state.pantry = state.pantry.filter(p => p !== name);
+      db.set('pantry', state.pantry);
+      updateAllBadges();
+      renderPantry();
+      showToast(`Removed "${name}" from Pantry`);
+    }
+
+    /**
+     * =========================================================================
+     * 8. RECIPES VIEW, RECIPE DETAIL & PER-INGREDIENT LIST ROUTING
+     * =========================================================================
+     */
+    function renderRecipes() {
+      const search = (document.getElementById('recipe-search')?.value || '').trim().toLowerCase();
+
+      const tagSet = new Set(['All']);
+      state.recipes.forEach(r => (r.tags || []).forEach(t => tagSet.add(t)));
+      document.getElementById('recipe-tags-bar').innerHTML = Array.from(tagSet).map(tag => {
+        const active = state.selectedRecipeTag === tag;
+        return `
+          <button
+            onclick="setRecipeTagFilter('${escapeHTML(tag)}')"
+            style="${active ? '' : 'background-color: var(--bg-surface-elevated); border-color: var(--border-subtle); color: var(--text-secondary);'}"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition ${
+              active ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 border-emerald-500' : 'hover:border-emerald-500/40'
+            }"
+          >
+            ${escapeHTML(tag)}
+          </button>
+        `;
+      }).join('');
+
+      const filtered = state.recipes.filter(r => {
+        const tagOk = state.selectedRecipeTag === 'All' || (r.tags || []).includes(state.selectedRecipeTag);
+        if (!tagOk) return false;
+        if (!search) return true;
+        return (
+          r.title.toLowerCase().includes(search) ||
+          (r.tags || []).some(t => t.toLowerCase().includes(search)) ||
+          (r.ingredients || []).some(i => i.name.toLowerCase().includes(search))
+        );
+      });
+
+      const grid = document.getElementById('recipes-grid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="background-color: var(--bg-surface); border-color: var(--border-strong);" class="col-span-full rounded-2xl border border-dashed p-10 text-center space-y-1">
+            <p style="color: var(--text-primary);" class="font-bold">No recipes match your filter</p>
+            <p style="color: var(--text-muted);" class="text-xs">Try clearing your search or selecting "All" tags.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(recipe => {
+        const match = calculateRecipePantryMatch(recipe);
+        const keyIngs = (recipe.ingredients || []).slice(0, 4).map(i => i.name).join(', ');
+        const extra = Math.max(0, (recipe.ingredients || []).length - 4);
+
+        return `
+          <article
+            onclick="openRecipeDetail('${recipe.id}')"
+            style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);"
+            class="group cursor-pointer rounded-2xl border hover:border-emerald-500/50 p-5 flex flex-col justify-between gap-4 transition"
+          >
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-3">
+                <h3 style="color: var(--text-primary);" class="font-extrabold text-lg group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition leading-snug">
+                  ${escapeHTML(recipe.title)}
+                </h3>
+                <span style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold">
+                  ${recipe.servings} serv
+                </span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span style="color: var(--text-muted);" class="text-xs mr-1">⏱ ${escapeHTML(recipe.prepTime || '30 mins')}</span>
+                ${(recipe.tags || []).map(tag => `
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                    ${escapeHTML(tag)}
+                  </span>
+                `).join('')}
+              </div>
+
+              <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-2.5 rounded-xl border space-y-1.5">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span style="color: var(--text-muted);" class="font-semibold">Pantry Match (${match.matched}/${match.total} items)</span>
+                  <span class="font-extrabold ${match.pct >= 50 ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400'}">${match.pct}%</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-300/60 dark:bg-slate-800 overflow-hidden">
+                  <div class="h-full rounded-full ${match.pct >= 50 ? 'bg-emerald-500' : 'bg-indigo-500'}" style="width: ${match.pct}%"></div>
+                </div>
+              </div>
+
+              <p style="color: var(--text-muted);" class="text-xs line-clamp-2">
+                <span style="color: var(--text-secondary);" class="font-semibold">Ingredients:</span> ${escapeHTML(keyIngs)}${extra > 0 ? ` +${extra} more` : ''}
+              </p>
+            </div>
+
+            <div style="border-color: var(--border-subtle);" class="pt-3 border-t flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              <span>Scale & Route to Lists</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function setRecipeTagFilter(tag) {
+      state.selectedRecipeTag = tag;
+      renderRecipes();
+    }
+
+    function openRecipeDetail(recipeId) {
+      const recipe = state.recipes.find(r => r.id === recipeId);
+      if (!recipe) return;
+
+      state.activeRecipeDetailId = recipeId;
+      state.detailMultiplier = 1;
+      state.detailCheckedSteps = {};
+      state.detailGlobalListId = 'personal';
+      state.detailIngListOverrides = {};
+
+      renderRecipeDetailModal();
+      openModal('recipe-detail-modal');
+    }
+
+    function setDetailMultiplier(mult) {
+      state.detailMultiplier = mult;
+      renderRecipeDetailModal();
+    }
+
+    function toggleDetailStep(idx) {
+      state.detailCheckedSteps[idx] = !state.detailCheckedSteps[idx];
+      renderRecipeDetailModal();
+    }
+
+    function setDetailGlobalList(listId) {
+      state.detailGlobalListId = listId;
+      state.detailIngListOverrides = {};
+      renderRecipeDetailModal();
+    }
+
+    function cycleIngredientTargetList(idx) {
+      const current = state.detailIngListOverrides[idx] || state.detailGlobalListId;
+      const listIds = state.lists.map(l => l.id);
+      const nextIdx = (listIds.indexOf(current) + 1) % listIds.length;
+      state.detailIngListOverrides[idx] = listIds[nextIdx];
+      renderRecipeDetailModal();
+    }
+
+    function renderRecipeDetailModal() {
+      const recipe = state.recipes.find(r => r.id === state.activeRecipeDetailId);
+      if (!recipe) return;
+
+      const mult = state.detailMultiplier;
+      const scaledServings = formatNumber(recipe.servings * mult);
+
+      const container = document.getElementById('recipe-detail-content');
+      container.innerHTML = `
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="px-6 py-5 border-b flex items-start justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2">
+              ${(recipe.tags || []).map(t => `<span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">${escapeHTML(t)}</span>`).join('')}
+              <span style="color: var(--text-muted);" class="text-xs">⏱ ${escapeHTML(recipe.prepTime || '30 mins')}</span>
+            </div>
+            <h3 style="color: var(--text-primary);" class="text-xl sm:text-2xl font-extrabold tracking-tight">${escapeHTML(recipe.title)}</h3>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="openRecipeFormModal('${recipe.id}')" style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary);" class="px-3 py-1.5 rounded-xl border text-xs font-semibold hover:opacity-85">
+              Edit
+            </button>
+            <button onclick="deleteRecipe('${recipe.id}')" style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary);" class="px-3 py-1.5 rounded-xl border hover:border-rose-500/50 hover:text-rose-500 text-xs font-semibold">
+              Delete
+            </button>
+            <button onclick="closeModal('recipe-detail-modal')" style="color: var(--text-muted);" class="p-2 rounded-xl hover:bg-slate-500/10">✕</button>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl border">
+            <div style="color: var(--text-primary);" class="text-sm font-bold">
+              Portions: <span class="text-emerald-600 dark:text-emerald-400">${scaledServings} servings</span>
+              <span style="color: var(--text-muted);" class="text-xs font-normal">(base ${recipe.servings})</span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <span style="color: var(--text-muted);" class="text-xs mr-1">Scale:</span>
+              ${[0.5, 1, 2, 3].map(m => `
+                <button
+                  onclick="setDetailMultiplier(${m})"
+                  style="${mult === m ? '' : 'background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary);'}"
+                  class="px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                    mult === m ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 border-emerald-500' : 'hover:border-emerald-500/50'
+                  }"
+                >
+                  ${m}×
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-6 space-y-3">
+              <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-4 rounded-2xl border space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Send to Grocery List</span>
+                  <div class="flex items-center gap-2">
+                    <label for="detail-global-list" style="color: var(--text-muted);" class="text-[11px]">Default List:</label>
+                    <select id="detail-global-list" onchange="setDetailGlobalList(this.value)" style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);" class="px-2.5 py-1 rounded-lg border text-xs font-bold focus:outline-none">
+                      ${state.lists.map(l => `
+                        <option value="${l.id}" ${l.id === state.detailGlobalListId ? 'selected' : ''}>${escapeHTML(l.name)}</option>
+                      `).join('')}
+                    </select>
+                  </div>
+                </div>
+                <p style="color: var(--text-muted);" class="text-[11px] leading-relaxed">
+                  Items in your Pantry are auto-unchecked. Tap any item's list pill (<span class="text-emerald-600 dark:text-emerald-300 font-semibold">Personal</span> / <span class="text-indigo-600 dark:text-indigo-300 font-semibold">Shared</span>) to split bulk items across lists in one go.
+                </p>
+
+                <div class="space-y-2 max-h-80 overflow-y-auto pr-1">
+                  ${(recipe.ingredients || []).map((ing, idx) => {
+                    const inPantry = isIngredientInPantry(ing.name);
+                    const scaledQty = formatItemQtyUnit(ing.amount * mult, ing.unit);
+                    const destListId = state.detailIngListOverrides[idx] || state.detailGlobalListId;
+                    const destList = state.lists.find(l => l.id === destListId) || CORE_LISTS[0];
+                    const destColors = getListColorClasses(destList.color);
+
+                    return `
+                      <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="p-2.5 rounded-xl border flex items-center justify-between gap-2">
+                        <label class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer">
+                          <input type="checkbox" ${inPantry ? '' : 'checked'} data-ing-idx="${idx}" class="detail-ing-checkbox w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 shrink-0" />
+                          <div class="min-w-0">
+                            <div style="color: var(--text-primary);" class="text-xs font-bold truncate">
+                              <span class="text-emerald-600 dark:text-emerald-400">${escapeHTML(scaledQty)}</span> ${escapeHTML(ing.name)}
+                            </div>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                              <span style="color: var(--text-muted);" class="text-[10px]">${escapeHTML(ing.aisle)}</span>
+                              ${inPantry ? `<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">In Pantry</span>` : ''}
+                            </div>
+                          </div>
+                        </label>
+
+                        <button
+                          type="button"
+                          onclick="cycleIngredientTargetList(${idx})"
+                          class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border shrink-0 transition hover:brightness-110 ${destColors.badge}"
+                          title="Tap to switch destination list for this ingredient"
+                        >
+                          ${escapeHTML(destList.id === 'shared' ? 'Shared' : destList.name)} ↻
+                        </button>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+
+                <button type="button" onclick="sendRecipeIngredientsToLists()" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 active:scale-[0.99] text-white dark:text-slate-950 font-extrabold text-sm shadow-md shadow-emerald-500/15 transition">
+                  Send Checked Ingredients to Lists
+                </button>
+              </div>
+            </div>
+
+            <div class="lg:col-span-6 space-y-3">
+              <h4 style="color: var(--text-muted);" class="text-xs font-extrabold uppercase tracking-wider">Cooking Steps (Tap to check off)</h4>
+              <ol class="space-y-2.5">
+                ${(recipe.steps || []).map((step, idx) => {
+                  const done = !!state.detailCheckedSteps[idx];
+                  return `
+                    <li
+                      onclick="toggleDetailStep(${idx})"
+                      style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);"
+                      class="cursor-pointer p-3.5 rounded-2xl border transition flex items-start gap-3 ${done ? 'opacity-55' : 'hover:border-emerald-500/40'}"
+                    >
+                      <span
+                        style="${done ? '' : 'background-color: var(--bg-surface); color: var(--text-secondary);'}"
+                        class="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold ${
+                          done ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950' : ''
+                        }"
+                      >
+                        ${done ? '✓' : idx + 1}
+                      </span>
+                      <p style="color: ${done ? 'var(--text-muted)' : 'var(--text-primary)'};" class="text-xs sm:text-sm leading-relaxed ${done ? 'line-through' : ''}">
+                        ${escapeHTML(step)}
+                      </p>
+                    </li>
+                  `;
+                }).join('')}
+              </ol>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function sendRecipeIngredientsToLists() {
+      const recipe = state.recipes.find(r => r.id === state.activeRecipeDetailId);
+      if (!recipe) return;
+
+      const checkedBoxes = document.querySelectorAll('.detail-ing-checkbox:checked');
+      if (checkedBoxes.length === 0) {
+        showToast('Select at least one ingredient to send.', 'error');
+        return;
+      }
+
+      const mult = state.detailMultiplier;
+      const sourceLabel = mult === 1 ? recipe.title : `${recipe.title} (${mult}×)`;
+      const buckets = {};
+
+      checkedBoxes.forEach(cb => {
+        const idx = Number(cb.dataset.ingIdx);
+        const ing = recipe.ingredients[idx];
+        const destListId = state.detailIngListOverrides[idx] || state.detailGlobalListId;
+
+        if (!buckets[destListId]) buckets[destListId] = [];
+        buckets[destListId].push({
+          name: ing.name,
+          qty: Number((ing.amount * mult).toFixed(2)),
+          unit: ing.unit,
+          aisle: ing.aisle
+        });
+      });
+
+      Object.entries(buckets).forEach(([listId, items]) => {
+        mergeItemsIntoList(items, listId, sourceLabel);
+      });
+
+      const listCount = Object.keys(buckets).length;
+      closeModal('recipe-detail-modal');
+      showToast(
+        listCount > 1
+          ? `Routed ${checkedBoxes.length} ingredients across ${listCount} lists!`
+          : `Sent ${checkedBoxes.length} ingredients to ${(state.lists.find(l => l.id === Object.keys(buckets)[0]) || {}).name}!`
+      );
+    }
+
+    /**
+     * =========================================================================
+     * 9. ADD / EDIT RECIPE MODAL & QUICK-PASTE PARSER
+     * =========================================================================
+     */
+    function openRecipeFormModal(recipeId = null) {
+      closeModal('recipe-detail-modal');
+      const titleEl = document.getElementById('recipe-form-title');
+      const idInput = document.getElementById('edit-recipe-id');
+      const nameInput = document.getElementById('form-recipe-title');
+      const servInput = document.getElementById('form-recipe-servings');
+      const timeInput = document.getElementById('form-recipe-time');
+      const tagsInput = document.getElementById('form-recipe-tags');
+      const stepsInput = document.getElementById('form-recipe-steps');
+      const ingList = document.getElementById('form-ingredients-list');
+
+      document.getElementById('quick-paste-textarea').value = '';
+      ingList.innerHTML = '';
+
+      if (recipeId) {
+        const r = state.recipes.find(rec => rec.id === recipeId);
+        if (!r) return;
+        titleEl.textContent = 'Edit Recipe';
+        idInput.value = r.id;
+        nameInput.value = r.title;
+        servInput.value = r.servings;
+        timeInput.value = r.prepTime || '30 mins';
+        tagsInput.value = (r.tags || []).join(', ');
+        stepsInput.value = (r.steps || []).join('\n');
+        (r.ingredients || []).forEach(ing => addFormIngredientRow(ing));
+      } else {
+        titleEl.textContent = 'Add New Recipe';
+        idInput.value = '';
+        nameInput.value = '';
+        servInput.value = 4;
+        timeInput.value = '30 mins';
+        tagsInput.value = '';
+        stepsInput.value = '';
+        addFormIngredientRow();
+        addFormIngredientRow();
+      }
+
+      openModal('recipe-form-modal');
+    }
+
+    function addFormIngredientRow(ing = { name: '', amount: '', unit: 'g', aisle: 'Produce' }) {
+      const container = document.getElementById('form-ingredients-list');
+      const row = document.createElement('div');
+      row.className = 'grid grid-cols-12 gap-2 items-center form-ing-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Ingredient" value="${escapeHTML(ing.name)}" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" class="col-span-5 px-3 py-2 rounded-xl border text-xs ing-name" />
+        <input type="number" step="any" min="0" placeholder="Qty" value="${ing.amount}" required style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" class="col-span-2 px-2.5 py-2 rounded-xl border text-xs ing-amount" />
+        <select style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" class="col-span-2 px-2 py-2 rounded-xl border text-xs ing-unit">
+          ${['g', 'kg', 'ml', 'l', 'tbsp', 'tsp', 'tin', 'pack', 'pcs'].map(u => `<option value="${u}" ${ing.unit === u ? 'selected' : ''}>${u}</option>`).join('')}
+        </select>
+        <select style="background-color: var(--bg-input); border-color: var(--border-subtle); color: var(--text-primary);" class="col-span-2 px-2 py-2 rounded-xl border text-xs ing-aisle">
+          ${AISLES.map(a => `<option value="${a}" ${ing.aisle === a ? 'selected' : ''}>${a}</option>`).join('')}
+        </select>
+        <button type="button" onclick="this.parentElement.remove()" style="color: var(--text-muted);" class="col-span-1 hover:text-rose-500 text-xs font-bold flex justify-center">✕</button>
+      `;
+      container.appendChild(row);
+    }
+
+    function parseQuickPasteIngredients() {
+      const textarea = document.getElementById('quick-paste-textarea');
+      const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length === 0) {
+        showToast('Paste at least one ingredient line first.', 'error');
+        return;
+      }
+
+      document.querySelectorAll('.form-ing-row').forEach(row => {
+        if (!row.querySelector('.ing-name').value.trim()) row.remove();
+      });
+
+      let count = 0;
+      lines.forEach(line => {
+        const parsed = parseShorthandItem(line);
+        if (parsed) {
+          addFormIngredientRow({
+            name: parsed.name,
+            amount: parsed.qty,
+            unit: parsed.unit,
+            aisle: parsed.aisle
+          });
+          count++;
+        }
+      });
+
+      textarea.value = '';
+      showToast(`Parsed ${count} ingredients!`);
+    }
+
+    function saveRecipeForm(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-recipe-id').value || `rec_${Date.now()}`;
+      const title = document.getElementById('form-recipe-title').value.trim();
+      const servings = parseInt(document.getElementById('form-recipe-servings').value, 10) || 4;
+      const prepTime = document.getElementById('form-recipe-time').value.trim() || '30 mins';
+      const tags = document.getElementById('form-recipe-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+
+      const ingredients = Array.from(document.querySelectorAll('.form-ing-row')).map(row => ({
+        name: row.querySelector('.ing-name').value.trim(),
+        amount: parseFloat(row.querySelector('.ing-amount').value) || 1,
+        unit: row.querySelector('.ing-unit').value,
+        aisle: row.querySelector('.ing-aisle').value
+      })).filter(i => i.name);
+
+      const steps = document.getElementById('form-recipe-steps').value.split('\n').map(s => s.trim()).filter(Boolean);
+
+      const recipeObj = {
+        id,
+        title,
+        servings,
+        prepTime,
+        tags: tags.length ? tags : ['Homemade'],
+        ingredients,
+        steps
+      };
+
+      const existingIdx = state.recipes.findIndex(r => r.id === id);
+      if (existingIdx >= 0) {
+        state.recipes[existingIdx] = recipeObj;
+      } else {
+        state.recipes.unshift(recipeObj);
+      }
+
+      db.set('recipes', state.recipes);
+      updateAllBadges();
+      renderRecipes();
+      closeModal('recipe-form-modal');
+      showToast(`Saved "${title}"`);
+    }
+
+    function deleteRecipe(recipeId) {
+      state.recipes = state.recipes.filter(r => r.id !== recipeId);
+      db.set('recipes', state.recipes);
+      updateAllBadges();
+      renderRecipes();
+      closeModal('recipe-detail-modal');
+      showToast('Recipe deleted');
+    }
+
+    /**
+     * =========================================================================
+     * 10. WEEKLY MEAL PLANNER (PERSONAL VS SHARED SCOPE + SMART ROUTE)
+     * =========================================================================
+     */
+    let activeMealSlotMode = 'recipe';
+
+    function renderMealPlanner() {
+      const grid = document.getElementById('meal-plan-grid');
+      grid.innerHTML = DAYS_OF_WEEK.map(day => {
+        const meals = state.mealPlan[day] || [];
+
+        const mealsHTML = meals.map(meal => {
+          const isShared = meal.scope === 'shared';
+          const scopeBadge = isShared
+            ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">Shared</span>`
+            : `<span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">Personal</span>`;
+
+          if (meal.type === 'custom') {
+            const hasItems = !!(meal.groceryItemsRaw && meal.groceryItemsRaw.trim());
+            return `
+              <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-3 rounded-xl border ${isShared ? '!border-indigo-500/35' : ''} space-y-1.5">
+                <div class="flex items-center justify-between gap-1">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    ${scopeBadge}
+                    <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400">${escapeHTML(meal.label || 'Quick')}</span>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button type="button" onclick="openMealSlotModal('${day}', '${meal.id}')" style="color: var(--text-muted);" class="p-1 hover:text-emerald-500 text-[11px]" title="Edit">✎</button>
+                    <button type="button" onclick="removeMealSlot('${day}', '${meal.id}')" style="color: var(--text-muted);" class="p-1 hover:text-rose-500 text-[11px]" title="Remove">✕</button>
+                  </div>
+                </div>
+                <div style="color: var(--text-primary);" class="font-bold text-xs leading-snug">${escapeHTML(meal.title)}</div>
+                ${hasItems ? `<div style="color: var(--text-muted);" class="text-[11px] truncate">🛒 ${escapeHTML(meal.groceryItemsRaw)}</div>` : `<div style="color: var(--text-muted);" class="text-[10px] italic">No groceries needed</div>`}
+              </div>
+            `;
+          } else {
+            const recipe = state.recipes.find(r => r.id === meal.recipeId);
+            const title = recipe ? recipe.title : 'Deleted Recipe';
+            const serv = meal.servings || (recipe ? recipe.servings : 2);
+            return `
+              <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-3 rounded-xl border ${isShared ? '!border-indigo-500/35' : '!border-emerald-500/30'} space-y-1.5">
+                <div class="flex items-center justify-between gap-1">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    ${scopeBadge}
+                    <span style="color: var(--text-muted);" class="text-[10px] font-semibold">${escapeHTML(meal.label || 'Dinner')}</span>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button type="button" onclick="openMealSlotModal('${day}', '${meal.id}')" style="color: var(--text-muted);" class="p-1 hover:text-emerald-500 text-[11px]" title="Edit">✎</button>
+                    <button type="button" onclick="removeMealSlot('${day}', '${meal.id}')" style="color: var(--text-muted);" class="p-1 hover:text-rose-500 text-[11px]" title="Remove">✕</button>
+                  </div>
+                </div>
+                <div ${recipe ? `onclick="openRecipeDetail('${recipe.id}')"` : ''} style="color: var(--text-primary);" class="font-bold text-xs leading-snug ${recipe ? 'hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer' : ''}">
+                  ${escapeHTML(title)}
+                </div>
+                <div style="color: var(--text-muted);" class="text-[11px]">${serv} servings</div>
+              </div>
+            `;
+          }
+        }).join('');
+
+        return `
+          <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="rounded-2xl border p-4 flex flex-col justify-between gap-3">
+            <div class="space-y-2.5">
+              <div style="border-color: var(--border-subtle);" class="flex items-center justify-between border-b pb-2">
+                <span style="${meals.length > 0 ? '' : 'color: var(--text-muted);'}" class="text-xs font-extrabold uppercase tracking-wider ${meals.length > 0 ? 'text-emerald-600 dark:text-emerald-400' : ''}">${day}</span>
+                <span style="color: var(--text-muted);" class="text-[11px]">${meals.length} ${meals.length === 1 ? 'meal' : 'meals'}</span>
+              </div>
+              <div class="space-y-2">
+                ${mealsHTML || `<p style="color: var(--text-muted);" class="text-xs py-4 text-center">No meals planned</p>`}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onclick="openMealSlotModal('${day}')"
+              style="border-color: var(--border-strong); color: var(--text-muted);"
+              class="w-full py-2 px-3 rounded-xl border border-dashed hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 text-xs font-bold transition"
+            >
+              + Add Meal
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openMealSlotModal(day, editMealId = null) {
+      document.getElementById('meal-slot-day').value = day;
+      document.getElementById('meal-slot-edit-id').value = editMealId || '';
+      document.getElementById('meal-slot-modal-title').textContent = `${editMealId ? 'Edit' : 'Plan'} Meal for ${day}`;
+
+      const select = document.getElementById('slot-recipe-select');
+      select.innerHTML = state.recipes.map(r => `<option value="${r.id}" data-servings="${r.servings}">${escapeHTML(r.title)}</option>`).join('');
+
+      document.getElementById('custom-meal-presets').innerHTML = CUSTOM_MEAL_PRESETS.map((p, idx) => `
+        <button
+          type="button"
+          onclick="applyCustomMealPreset(${idx})"
+          style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle); color: var(--text-secondary);"
+          class="px-2.5 py-1.5 rounded-xl text-xs font-semibold border hover:border-amber-500/40 transition"
+        >
+          + ${escapeHTML(p.title)}
+        </button>
+      `).join('');
+
+      document.querySelector('input[name="mealScope"][value="personal"]').checked = true;
+      document.getElementById('meal-slot-label').value = 'Dinner';
+      document.getElementById('slot-custom-title').value = '';
+      document.getElementById('slot-custom-items').value = '';
+      syncSlotRecipeDefaultServings();
+
+      if (editMealId) {
+        const meal = (state.mealPlan[day] || []).find(m => m.id === editMealId);
+        if (meal) {
+          const scopeRadio = document.querySelector(`input[name="mealScope"][value="${meal.scope || 'personal'}"]`);
+          if (scopeRadio) scopeRadio.checked = true;
+          document.getElementById('meal-slot-label').value = meal.label || 'Dinner';
+
+          if (meal.type === 'custom') {
+            setMealSlotMode('custom');
+            document.getElementById('slot-custom-title').value = meal.title || '';
+            document.getElementById('slot-custom-items').value = meal.groceryItemsRaw || '';
+          } else {
+            setMealSlotMode('recipe');
+            select.value = meal.recipeId;
+            document.getElementById('slot-recipe-servings').value = meal.servings || 2;
+          }
+        }
+      } else {
+        setMealSlotMode('recipe');
+      }
+
+      openModal('meal-slot-modal');
+    }
+
+    function syncSlotRecipeDefaultServings() {
+      const select = document.getElementById('slot-recipe-select');
+      const opt = select.options[select.selectedIndex];
+      if (opt && opt.dataset.servings) {
+        document.getElementById('slot-recipe-servings').value = opt.dataset.servings;
+      }
+    }
+
+    function setMealSlotMode(mode) {
+      activeMealSlotMode = mode;
+      const btnRec = document.getElementById('toggle-mode-recipe');
+      const btnCus = document.getElementById('toggle-mode-custom');
+      const formRec = document.getElementById('form-slot-recipe');
+      const formCus = document.getElementById('form-slot-custom');
+
+      if (mode === 'recipe') {
+        btnRec.style.backgroundColor = 'var(--bg-surface)';
+        btnRec.style.boxShadow = 'var(--shadow-card)';
+        btnRec.className = 'py-2 px-3 rounded-lg text-xs font-bold transition text-emerald-600 dark:text-emerald-400';
+        btnCus.style.backgroundColor = 'transparent';
+        btnCus.style.boxShadow = 'none';
+        btnCus.style.color = 'var(--text-muted)';
+        btnCus.className = 'py-2 px-3 rounded-lg text-xs font-bold transition';
+        formRec.classList.remove('hidden');
+        formCus.classList.add('hidden');
+      } else {
+        btnCus.style.backgroundColor = 'var(--bg-surface)';
+        btnCus.style.boxShadow = 'var(--shadow-card)';
+        btnCus.className = 'py-2 px-3 rounded-lg text-xs font-bold transition text-amber-600 dark:text-amber-400';
+        btnRec.style.backgroundColor = 'transparent';
+        btnRec.style.boxShadow = 'none';
+        btnRec.style.color = 'var(--text-muted)';
+        btnRec.className = 'py-2 px-3 rounded-lg text-xs font-bold transition';
+        formCus.classList.remove('hidden');
+        formRec.classList.add('hidden');
+      }
+    }
+
+    function applyCustomMealPreset(idx) {
+      const p = CUSTOM_MEAL_PRESETS[idx];
+      if (!p) return;
+      document.getElementById('slot-custom-title').value = p.title;
+      document.getElementById('slot-custom-items').value = p.items;
+    }
+
+    function saveRecipeMealSlot(e) {
+      e.preventDefault();
+      const day = document.getElementById('meal-slot-day').value;
+      const editId = document.getElementById('meal-slot-edit-id').value;
+      const scope = document.querySelector('input[name="mealScope"]:checked')?.value || 'personal';
+      const label = document.getElementById('meal-slot-label').value.trim() || 'Dinner';
+      const recipeId = document.getElementById('slot-recipe-select').value;
+      const servings = parseInt(document.getElementById('slot-recipe-servings').value, 10) || 2;
+
+      state.mealPlan[day] = state.mealPlan[day] || [];
+      const payload = { id: editId || `meal_${Date.now()}`, type: 'recipe', scope, label, recipeId, servings };
+
+      if (editId) {
+        const i = state.mealPlan[day].findIndex(m => m.id === editId);
+        if (i >= 0) state.mealPlan[day][i] = payload;
+      } else {
+        state.mealPlan[day].push(payload);
+      }
+
+      db.set('mealPlan', state.mealPlan);
+      closeModal('meal-slot-modal');
+      renderMealPlanner();
+      showToast(`Planned ${scope === 'shared' ? 'Shared' : 'Personal'} meal for ${day}`);
+    }
+
+    function saveCustomMealSlot(e) {
+      e.preventDefault();
+      const day = document.getElementById('meal-slot-day').value;
+      const editId = document.getElementById('meal-slot-edit-id').value;
+      const scope = document.querySelector('input[name="mealScope"]:checked')?.value || 'personal';
+      const label = document.getElementById('meal-slot-label').value.trim() || 'Quick Meal';
+      const title = document.getElementById('slot-custom-title').value.trim();
+      const groceryItemsRaw = document.getElementById('slot-custom-items').value.trim();
+      if (!title) return;
+
+      state.mealPlan[day] = state.mealPlan[day] || [];
+      const payload = { id: editId || `meal_${Date.now()}`, type: 'custom', scope, label, title, groceryItemsRaw };
+
+      if (editId) {
+        const i = state.mealPlan[day].findIndex(m => m.id === editId);
+        if (i >= 0) state.mealPlan[day][i] = payload;
+      } else {
+        state.mealPlan[day].push(payload);
+      }
+
+      db.set('mealPlan', state.mealPlan);
+      closeModal('meal-slot-modal');
+      renderMealPlanner();
+      showToast(`Added "${title}" to ${day}`);
+    }
+
+    function removeMealSlot(day, mealId) {
+      state.mealPlan[day] = (state.mealPlan[day] || []).filter(m => m.id !== mealId);
+      db.set('mealPlan', state.mealPlan);
+      renderMealPlanner();
+    }
+
+    function clearMealPlan() {
+      DAYS_OF_WEEK.forEach(d => (state.mealPlan[d] = []));
+      db.set('mealPlan', state.mealPlan);
+      renderMealPlanner();
+      showToast('Weekly meal plan cleared');
+    }
+
+    function openGenerateWeekModal() {
+      let personalCount = 0;
+      let sharedCount = 0;
+      DAYS_OF_WEEK.forEach(d => {
+        (state.mealPlan[d] || []).forEach(m => {
+          if (m.scope === 'shared') sharedCount++;
+          else personalCount++;
+        });
+      });
+
+      if (personalCount + sharedCount === 0) {
+        showToast('Plan at least one meal on Mon–Sun first.', 'error');
+        return;
+      }
+
+      document.getElementById('generate-week-summary').innerHTML = `
+        Found <strong class="text-emerald-600 dark:text-emerald-400">${personalCount} Personal</strong> meal(s) and
+        <strong class="text-indigo-600 dark:text-indigo-400">${sharedCount} Shared Household</strong> meal(s) planned this week.
+      `;
+
+      const overrideSelect = document.getElementById('week-override-list-select');
+      overrideSelect.innerHTML = state.lists.map(l => `<option value="${l.id}">${escapeHTML(l.name)}</option>`).join('');
+      document.querySelector('input[name="weekRouteMode"][value="smart"]').checked = true;
+      toggleWeekOverrideSelect();
+
+      openModal('generate-week-modal');
+    }
+
+    function toggleWeekOverrideSelect() {
+      const mode = document.querySelector('input[name="weekRouteMode"]:checked')?.value;
+      document.getElementById('week-override-list-select').disabled = mode !== 'single';
+    }
+
+    function executeGenerateWeekShoppingList() {
+      const routeMode = document.querySelector('input[name="weekRouteMode"]:checked')?.value || 'smart';
+      const overrideListId = document.getElementById('week-override-list-select').value || 'personal';
+      const skipPantry = document.getElementById('week-skip-pantry').checked;
+
+      let routedMeals = 0;
+
+      DAYS_OF_WEEK.forEach(day => {
+        const shortDay = day.slice(0, 3);
+        (state.mealPlan[day] || []).forEach(meal => {
+          const targetListId = routeMode === 'smart'
+            ? (meal.scope === 'shared' ? 'shared' : 'personal')
+            : overrideListId;
+
+          if (meal.type === 'custom') {
+            if (meal.groceryItemsRaw && meal.groceryItemsRaw.trim()) {
+              const items = meal.groceryItemsRaw
+                .split(',')
+                .map(part => parseShorthandItem(part))
+                .filter(Boolean)
+                .filter(item => !skipPantry || !isIngredientInPantry(item.name));
+
+              if (items.length > 0) {
+                mergeItemsIntoList(items, targetListId, `${shortDay}: ${meal.title}`);
+                routedMeals++;
+              }
+            }
+          } else {
+            const recipe = state.recipes.find(r => r.id === meal.recipeId);
+            if (recipe) {
+              const scale = (Number(meal.servings) || recipe.servings) / (recipe.servings || 1);
+              const items = (recipe.ingredients || [])
+                .filter(ing => !skipPantry || !isIngredientInPantry(ing.name))
+                .map(ing => ({
+                  name: ing.name,
+                  qty: Number((ing.amount * scale).toFixed(2)),
+                  unit: ing.unit,
+                  aisle: ing.aisle
+                }));
+
+              if (items.length > 0) {
+                mergeItemsIntoList(items, targetListId, `${shortDay}: ${recipe.title}`);
+                routedMeals++;
+              }
+            }
+          }
+        });
+      });
+
+      closeModal('generate-week-modal');
+      setActiveList(routeMode === 'smart' ? 'all' : overrideListId);
+      switchTab('grocery');
+      showToast(`Routed ingredients from ${routedMeals} planned meals!`);
+    }
+
+    /**
+     * =========================================================================
+     * 11. BACKUP / EXPORT / CLIPBOARD HELPERS
+     * =========================================================================
+     */
+    function copyInviteLink() {
+      const val = document.getElementById('invite-link-input').value;
+      copyTextToClipboard(val);
+      showToast('Copied housemate invite link!');
+    }
+
+    function exportBackupJSON() {
+      const payload = {
+        app: 'KitchenSync',
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        lists: state.lists,
+        shoppingItems: state.shoppingItems,
+        recipes: state.recipes,
+        mealPlan: state.mealPlan,
+        pantry: state.pantry
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `kitchensync_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Exported KitchenSync JSON backup');
+    }
+
+    function importBackupJSON(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data.lists)) { state.lists = data.lists; db.set('lists', state.lists); }
+          if (Array.isArray(data.shoppingItems)) { state.shoppingItems = data.shoppingItems; db.set('shoppingItems', state.shoppingItems); }
+          if (Array.isArray(data.recipes)) { state.recipes = data.recipes; db.set('recipes', state.recipes); }
+          if (Array.isArray(data.pantry)) { state.pantry = data.pantry; db.set('pantry', state.pantry); }
+          if (data.mealPlan && typeof data.mealPlan === 'object') { state.mealPlan = data.mealPlan; db.set('mealPlan', state.mealPlan); }
+
+          updateAllBadges();
+          switchTab(state.activeTab);
+          closeModal('sync-modal');
+          showToast('Successfully imported JSON backup!');
+        } catch (err) {
+          showToast('Invalid JSON backup file.', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function copyTextToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.warn('Clipboard copy fallback warning:', err);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
