@@ -7,8 +7,16 @@
   <meta name="description" content="KitchenSync — Recipes, Meal Plan & Smart Grocery List" />
   <title>KitchenSync — Recipes, Meal Plan & Smart Grocery List</title>
 
-  <!-- Dynamic Blob PWA Manifest attached & updated by ThemeManager -->
-  <link rel="manifest" id="pwa-manifest" />
+  <!-- iOS & Cross-Platform PWA Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="KitchenSync" />
+
+  <!-- Dynamic Manifest & Inline SVG App Icon (Zero 404s) -->
+  <link rel="manifest" id="pwa-manifest-link" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2310b981'/%3E%3Cstop offset='50%25' stop-color='%2314b8a6'/%3E%3Cstop offset='100%25' stop-color='%236366f1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12v14a5 5 0 0 0 10 0V12M25 12v40'/%3E%3Cpath d='M40 20l6-6 6 6M46 14v21a9 9 0 0 1-9 9h-4'/%3E%3Cpath d='M38 39l-5 5 5 5'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" id="apple-touch-icon" />
 
   <!-- Inter Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -104,59 +112,37 @@
 <body class="min-h-screen flex flex-col selection:bg-emerald-500/25 selection:text-emerald-700 dark:selection:text-emerald-200">
 
   <!-- Toast Notification Container (Replaces alert/confirm) -->
-  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-5 right-4 left-4 md:left-auto md:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- ===================================================================== -->
-  <!-- TOP NAVIGATION HEADER                                                 -->
+  <!-- TWO-ROW STICKY TOP HEADER (ZERO-OVERLAP RESPONSIVE LAYOUT)            -->
   <!-- ===================================================================== -->
   <header style="background-color: var(--bg-header); border-color: var(--border-subtle);" class="sticky top-0 z-30 backdrop-blur-md border-b transition-colors">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-3">
-      <!-- Brand Identity -->
-      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
-          <!-- Custom Inline SVG KitchenSync Fork/Sync Logo -->
-          <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+    <!-- Row 1: Brand Emblem/Wordmark (Left) + Theme, Install & Cloud Sync Controls (Right) -->
+    <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2">
+      <!-- Left: KitchenSync SVG Emblem + Wordmark (shrink-0 prevents overlap at any width) -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M7 3v6a2 2 0 002 2h0a2 2 0 002-2V3M9 3v18" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7l3-3 3 3M19 4v9a4 4 0 01-4 4h-2" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 2 2 2" />
           </svg>
         </div>
-        <div class="min-w-0">
-          <div class="flex items-center gap-2">
-            <h1 style="color: var(--text-primary);" class="font-extrabold text-base sm:text-lg tracking-tight leading-none">KitchenSync</h1>
-          </div>
-          <p style="color: var(--text-muted);" class="hidden sm:block text-xs truncate mt-0.5">Recipes, Meal Plan & Smart Grocery List</p>
-        </div>
+        <span style="color: var(--text-primary);" class="font-extrabold text-sm min-[380px]:text-base sm:text-lg tracking-tight leading-none whitespace-nowrap">
+          KitchenSync
+        </span>
       </div>
 
-      <!-- Desktop Navigation Tabs -->
-      <nav style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="hidden md:flex items-center p-1 rounded-xl border" aria-label="Primary Navigation">
-        <button onclick="switchTab('grocery')" data-tab="grocery" class="nav-tab-desktop px-3.5 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-2">
-          <span>Grocery Lists</span>
-          <span id="badge-grocery-desktop" class="text-xs px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold">0</span>
-        </button>
-        <button onclick="switchTab('recipes')" data-tab="recipes" class="nav-tab-desktop px-3.5 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-2">
-          <span>Recipes</span>
-          <span id="badge-recipes-desktop" style="background-color: var(--bg-surface); color: var(--text-secondary);" class="text-xs px-1.5 py-0.2 rounded-md font-semibold">4</span>
-        </button>
-        <button onclick="switchTab('planner')" data-tab="planner" class="nav-tab-desktop px-3.5 py-1.5 rounded-lg text-sm font-semibold transition">
-          Meal Plan
-        </button>
-        <button onclick="switchTab('pantry')" data-tab="pantry" class="nav-tab-desktop px-3.5 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-2">
-          <span>Pantry</span>
-          <span id="badge-pantry-desktop" style="background-color: var(--bg-surface); color: var(--text-secondary);" class="text-xs px-1.5 py-0.2 rounded-md font-semibold">0</span>
-        </button>
-      </nav>
-
-      <!-- Right Controls: 3-Way Theme Switcher + Live Cloud Sync Pill -->
-      <div class="flex items-center gap-2 shrink-0">
-        <!-- 3-Way Segmented Theme Selector (Light / Dark / System) -->
+      <!-- Right: Icon-Only 3-Way Theme Pill + PWA Install Button + Cloud Sync Status Pill -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <!-- Compact Icon-Only 3-Way Theme Toggle Pill -->
         <div
           id="theme-switcher"
           role="radiogroup"
           aria-label="Theme selector"
           style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);"
-          class="inline-flex items-center p-1 rounded-xl border"
+          class="inline-flex items-center p-0.5 sm:p-1 rounded-xl border shrink-0"
         >
           <button
             type="button"
@@ -166,14 +152,12 @@
             onclick="setThemeMode('light')"
             title="Light theme"
             aria-label="Light theme"
-            class="theme-btn px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+            class="theme-btn p-1.5 rounded-lg transition flex items-center justify-center"
           >
-            <!-- Sun Icon -->
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="4" />
               <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" />
             </svg>
-            <span class="hidden xl:inline">Light</span>
           </button>
 
           <button
@@ -184,13 +168,11 @@
             onclick="setThemeMode('dark')"
             title="Dark theme"
             aria-label="Dark theme"
-            class="theme-btn px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+            class="theme-btn p-1.5 rounded-lg transition flex items-center justify-center"
           >
-            <!-- Moon Icon -->
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
             </svg>
-            <span class="hidden xl:inline">Dark</span>
           </button>
 
           <button
@@ -201,23 +183,37 @@
             onclick="setThemeMode('system')"
             title="System theme (Auto)"
             aria-label="System theme"
-            class="theme-btn px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+            class="theme-btn p-1.5 rounded-lg transition flex items-center justify-center"
           >
-            <!-- Monitor / Auto Icon -->
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <rect x="2" y="3" width="20" height="14" rx="2" />
               <path stroke-linecap="round" d="M8 21h8m-4-4v4" />
             </svg>
-            <span class="hidden xl:inline">System</span>
           </button>
         </div>
 
-        <!-- Live Cloud Sync Status Pill -->
+        <!-- PWA Install Button (Auto-hides when running in standalone PWA mode) -->
+        <button
+          type="button"
+          id="header-install-btn"
+          onclick="handleInstallButtonClick()"
+          style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-primary);"
+          class="p-1.5 min-[420px]:px-2.5 min-[420px]:py-1.5 rounded-xl border hover:border-emerald-500/50 text-xs font-bold flex items-center gap-1.5 transition shrink-0"
+          title="Install KitchenSync App"
+          aria-label="Install KitchenSync App"
+        >
+          <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span class="hidden min-[420px]:inline">Install</span>
+        </button>
+
+        <!-- Live Cloud Sync Status / Sign-In Pill -->
         <button
           id="cloud-sync-pill"
           onclick="openCloudSyncModal()"
           style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary);"
-          class="px-3 py-2 rounded-xl hover:border-indigo-500/50 border text-xs font-semibold flex items-center gap-2 transition shrink-0 max-w-[165px] sm:max-w-[220px]"
+          class="px-2 sm:px-3 py-1.5 rounded-xl hover:border-indigo-500/50 border text-xs font-semibold flex items-center gap-1.5 sm:gap-2 transition shrink-0 max-w-[88px] min-[380px]:max-w-[130px] sm:max-w-[200px]"
           title="Configure Firebase Authentication & Household Cloud Sync"
         >
           <span id="cloud-sync-dot-wrapper" class="relative flex h-2 w-2 shrink-0">
@@ -227,39 +223,77 @@
         </button>
       </div>
     </div>
+
+    <!-- Row 2: Dedicated Full-Width Navigation Sub-Row (Scrollable on 320px+, Zero Overlap) -->
+    <div style="border-color: var(--border-subtle);" class="border-t">
+      <nav
+        aria-label="Primary Navigation"
+        class="max-w-6xl mx-auto px-3 sm:px-6 py-1.5 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar"
+      >
+        <button onclick="switchTab('grocery')" data-tab="grocery" class="nav-tab-btn px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span>Grocery List</span>
+          <span id="badge-grocery" class="text-[11px] px-1.5 py-0.2 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold">0</span>
+        </button>
+
+        <button onclick="switchTab('recipes')" data-tab="recipes" class="nav-tab-btn px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span>Recipes</span>
+          <span id="badge-recipes" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="text-[11px] px-1.5 py-0.2 rounded-md font-semibold">4</span>
+        </button>
+
+        <button onclick="switchTab('planner')" data-tab="planner" class="nav-tab-btn px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Meal Planner</span>
+        </button>
+
+        <button onclick="switchTab('pantry')" data-tab="pantry" class="nav-tab-btn px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+          <span>Pantry</span>
+          <span id="badge-pantry" style="background-color: var(--bg-surface-elevated); color: var(--text-secondary);" class="text-[11px] px-1.5 py-0.2 rounded-md font-semibold">0</span>
+        </button>
+      </nav>
+    </div>
   </header>
 
   <!-- ===================================================================== -->
   <!-- MAIN CONTENT WORKSPACE                                                -->
   <!-- ===================================================================== -->
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6 pb-28 md:pb-12">
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6 pb-14">
 
     <!-- =================================================================== -->
-    <!-- VIEW 1: MULTI-GROCERY LISTS                                         -->
+    <!-- VIEW 1: MULTI-GROCERY LISTS (PERSONAL, SHARED HOUSEHOLD & ALL)      -->
     <!-- =================================================================== -->
     <section id="tab-grocery" class="space-y-5">
-      <!-- Top Title & Active List Description -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 style="color: var(--text-primary);" class="text-2xl font-extrabold tracking-tight">Grocery Lists</h2>
+          <h1 style="color: var(--text-primary);" class="text-2xl font-extrabold tracking-tight">Grocery Lists</h1>
           <p id="active-list-subtitle" style="color: var(--text-muted);" class="text-sm">
-            Solo weekday meals & personal items
+            Separate solo weekday meals from bulk household staples
           </p>
         </div>
 
-        <!-- View Mode & List Toolbar -->
         <div class="flex flex-wrap items-center gap-2">
-          <!-- By Aisle vs Flat List Toggle -->
-          <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="inline-flex rounded-xl p-1 border">
-            <button onclick="setGroceryViewMode('aisle')" id="btn-view-aisle" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+          <!-- View Mode Toggle: By Aisle vs Flat List -->
+          <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="inline-flex p-1 rounded-xl border">
+            <button type="button" id="btn-view-aisle" onclick="setGroceryViewMode('aisle')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition">
               By Aisle
             </button>
-            <button onclick="setGroceryViewMode('flat')" id="btn-view-flat" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+            <button type="button" id="btn-view-flat" onclick="setGroceryViewMode('flat')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition">
               Flat List
             </button>
           </div>
 
           <button
+            type="button"
             onclick="copyGroceryListForChat()"
             style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);"
             class="px-3.5 py-2 rounded-xl border hover:border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition"
@@ -476,40 +510,70 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- MOBILE BOTTOM NAVIGATION BAR                                          -->
+  <!-- MODAL 0: INSTALL APP / ADD TO HOME SCREEN GUIDE                       -->
   <!-- ===================================================================== -->
-  <nav style="background-color: var(--bg-header); border-color: var(--border-subtle);" class="md:hidden fixed bottom-0 inset-x-0 z-30 backdrop-blur-md border-t px-2 py-1.5 flex items-center justify-around">
-    <button onclick="switchTab('grocery')" data-tab="grocery" class="nav-tab-mobile relative flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition">
-      <div class="relative">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-        <span id="badge-grocery-mobile" class="absolute -top-1.5 -right-2.5 px-1.5 min-w-[18px] h-[18px] rounded-full bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 text-[10px] font-extrabold flex items-center justify-center">0</span>
+  <div id="install-guide-modal" class="fixed inset-0 z-40 hidden bg-slate-950/65 backdrop-blur-sm overflow-y-auto p-4">
+    <div style="background-color: var(--bg-surface); border-color: var(--border-subtle);" class="max-w-md mx-auto rounded-3xl border shadow-2xl overflow-hidden my-8">
+      <div style="border-color: var(--border-subtle);" class="px-6 py-4 border-b flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 via-teal-500 to-indigo-500 flex items-center justify-center text-white">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 3v6a2 2 0 002 2h0a2 2 0 002-2V3M9 3v18" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 7l3-3 3 3M19 4v9a4 4 0 01-4 4h-2" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 2 2 2" />
+            </svg>
+          </div>
+          <h3 style="color: var(--text-primary);" class="text-lg font-bold">Install KitchenSync App</h3>
+        </div>
+        <button onclick="closeModal('install-guide-modal')" style="color: var(--text-muted);" class="p-2 rounded-xl hover:bg-slate-500/10">✕</button>
       </div>
-      <span>Lists</span>
-    </button>
 
-    <button onclick="switchTab('recipes')" data-tab="recipes" class="nav-tab-mobile flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-      <span>Recipes</span>
-    </button>
+      <div style="color: var(--text-secondary);" class="p-6 space-y-4 text-xs">
+        <p style="color: var(--text-muted);" class="leading-relaxed">
+          Install <strong>KitchenSync</strong> directly onto your home screen or desktop dock so it opens full-screen without browser bars and syncs seamlessly across your devices.
+        </p>
 
-    <button onclick="switchTab('planner')" data-tab="planner" class="nav-tab-mobile flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-      <span>Meal Plan</span>
-    </button>
+        <!-- iPhone / iPad Safari -->
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-3.5 rounded-2xl border space-y-1.5">
+          <div style="color: var(--text-primary);" class="font-bold text-xs flex items-center gap-2">
+            <span>📱 iPhone & iPad (Safari)</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-[11px]" style="color: var(--text-muted);">
+            <li>Open this page in <strong>Safari</strong>.</li>
+            <li>Tap the <strong>Share</strong> icon (square with upward arrow) at the bottom or top bar.</li>
+            <li>Scroll down and tap <strong>Add to Home Screen</strong> → <strong>Add</strong>.</li>
+          </ol>
+        </div>
 
-    <button onclick="switchTab('pantry')" data-tab="pantry" class="nav-tab-mobile flex-1 py-2 rounded-xl flex flex-col items-center gap-1 text-[11px] font-semibold transition">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-      </svg>
-      <span>Pantry</span>
-    </button>
-  </nav>
+        <!-- Android Chrome -->
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-3.5 rounded-2xl border space-y-1.5">
+          <div style="color: var(--text-primary);" class="font-bold text-xs flex items-center gap-2">
+            <span>🤖 Android (Chrome / Edge)</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-[11px]" style="color: var(--text-muted);">
+            <li>Tap the <strong>⋮</strong> menu in the top-right corner of Chrome.</li>
+            <li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
+          </ol>
+        </div>
+
+        <!-- Desktop Chrome / Edge -->
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-3.5 rounded-2xl border space-y-1.5">
+          <div style="color: var(--text-primary);" class="font-bold text-xs flex items-center gap-2">
+            <span>💻 Desktop (Chrome / Edge)</span>
+          </div>
+          <p class="text-[11px]" style="color: var(--text-muted);">
+            Click the <strong>Install</strong> icon on the right side of your browser's address bar.
+          </p>
+        </div>
+
+        <div style="border-color: var(--border-subtle);" class="flex items-center justify-end pt-2 border-t">
+          <button type="button" onclick="closeModal('install-guide-modal')" class="px-5 py-2 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 font-bold text-xs">
+            Got It
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ===================================================================== -->
   <!-- MODAL 1: CREATE NEW CUSTOM GROCERY LIST                               -->
@@ -846,7 +910,7 @@
             </button>
           </div>
 
-          <div id="fb-config-editor-box" class="space-y-2.5">
+          <div id="fb-config-editor-box" class="space-y-2.5 hidden">
             <p style="color: var(--text-muted);" class="text-[11px] leading-relaxed">
               Paste your <code class="text-emerald-600 dark:text-emerald-400 font-mono">firebaseConfig</code> object (either raw JS snippet from Firebase Console or JSON) to connect immediately:
             </p>
@@ -859,7 +923,7 @@
             ></textarea>
             <div class="flex flex-wrap items-center justify-between gap-2">
               <button type="button" id="btn-clear-fb-config" onclick="clearSavedFirebaseConfig()" class="hidden px-3 py-1.5 rounded-xl border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold hover:bg-rose-500/10">
-                Disconnect Config
+                Disconnect Override
               </button>
               <button type="button" onclick="saveRuntimeFirebaseConfig()" class="ml-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition">
                 Save & Connect Firebase
@@ -959,6 +1023,38 @@
           </div>
         </div>
 
+        <!-- STEP 4: INSTALL APP & OFFLINE SERVICE WORKER STATUS -->
+        <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="p-4 rounded-2xl border space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+              Install App & Offline Status
+            </span>
+            <span id="pwa-sw-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/15 text-slate-600 dark:text-slate-300">
+              Checking App Mode...
+            </span>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="space-y-0.5">
+              <div id="pwa-mode-status-text" style="color: var(--text-primary);" class="font-bold text-xs">
+                Running in Browser Tab
+              </div>
+              <p style="color: var(--text-muted);" class="text-[11px]">
+                Add to your Home Screen for full-screen shopping & crisp app icon.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              id="modal-install-action-btn"
+              onclick="closeModal('sync-modal'); handleInstallButtonClick();"
+              class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 font-bold text-xs shrink-0 transition"
+            >
+              Install / Home Screen Guide
+            </button>
+          </div>
+        </div>
+
         <!-- Backup & Restore -->
         <div style="border-color: var(--border-subtle);" class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t">
           <div class="flex items-center gap-2">
@@ -1002,22 +1098,9 @@
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
     /* =========================================================================
-     * 0. FIREBASE CONFIGURATION (PRE-CONFIG IN CODE OR RUNTIME IN MODAL)
-     *
-     * Replace `null` below with your Firebase Web App `firebaseConfig` object
-     * so every housemate opening your GitHub Pages link connects automatically:
-     *
-     * const DEFAULT_FIREBASE_CONFIG = {
-     *   apiKey: "AIzaSy...",
-     *   authDomain: "your-project.firebaseapp.com",
-     *   projectId: "your-project",
-     *   storageBucket: "your-project.firebasestorage.app",
-     *   messagingSenderId: "1234567890",
-     *   appId: "1:1234567890:web:abcdef"
-     * };
+     * 0. FIREBASE CONFIGURATION (PRE-CONFIGURED FOR KITCHENSYNC-2B42E)
      * ========================================================================= */
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const DEFAULT_FIREBASE_CONFIG = {
+    const DEFAULT_FIREBASE_CONFIG = {
       apiKey: "AIzaSyD0C-si8MnfeAvVFyOtdnOnvGPOYELWprQ",
       authDomain: "kitchensync-2b42e.firebaseapp.com",
       projectId: "kitchensync-2b42e",
@@ -1032,13 +1115,18 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 1. THEME CONTROLLER (LIGHT / DARK / SYSTEM + LIVE OS MATCHMEDIA + PWA)
+     * 1. THEME CONTROLLER & NATIVE PWA INSTALL / ICON / MANIFEST ENGINE
      * =========================================================================
      */
     const THEME_STORAGE_KEY = 'kitchensync_theme';
     let currentThemeMode = 'system';
-    let activeManifestBlobUrl = null;
     const osDarkMediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+    const pwaState = {
+      deferredPrompt: null,
+      isStandalone: false,
+      swStatus: 'checking'
+    };
 
     function getEffectiveTheme(mode) {
       if (mode === 'light') return 'light';
@@ -1056,8 +1144,6 @@ const DEFAULT_FIREBASE_CONFIG = {
       const themeHex = isDark ? '#020617' : '#fafaf9';
       const metaTheme = document.getElementById('meta-theme-color');
       if (metaTheme) metaTheme.setAttribute('content', themeHex);
-
-      updateDynamicPWAManifest(themeHex);
 
       document.querySelectorAll('.theme-btn').forEach(btn => {
         const isSelected = btn.dataset.themeOption === currentThemeMode;
@@ -1101,26 +1187,225 @@ const DEFAULT_FIREBASE_CONFIG = {
       }
     }
 
-    function updateDynamicPWAManifest(themeColorHex) {
+    /**
+     * Renders a crisp PNG KitchenSync app icon at any square resolution onto an
+     * offscreen canvas (used for iOS Apple Touch Icon and PWA Manifest PNG icons).
+     */
+    function renderKitchenSyncIconDataUrl(size) {
       try {
-        if (activeManifestBlobUrl) {
-          URL.revokeObjectURL(activeManifestBlobUrl);
-        }
-        const manifest = {
-          name: 'KitchenSync',
-          short_name: 'KitchenSync',
-          description: 'Recipes, Meal Plan & Smart Grocery List',
-          start_url: '.',
-          display: 'standalone',
-          background_color: themeColorHex,
-          theme_color: themeColorHex
-        };
-        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-        activeManifestBlobUrl = URL.createObjectURL(blob);
-        const link = document.getElementById('pwa-manifest');
-        if (link) link.href = activeManifestBlobUrl;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        const radius = Math.round(size * 0.22);
+        ctx.beginPath();
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(size - radius, 0);
+        ctx.quadraticCurveTo(size, 0, size, radius);
+        ctx.lineTo(size, size - radius);
+        ctx.quadraticCurveTo(size, size, size - radius, size);
+        ctx.lineTo(radius, size);
+        ctx.quadraticCurveTo(0, size, 0, size - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+        ctx.closePath();
+
+        const grad = ctx.createLinearGradient(0, 0, size, size);
+        grad.addColorStop(0, '#10b981');
+        grad.addColorStop(0.5, '#14b8a6');
+        grad.addColorStop(1, '#6366f1');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        const scale = size / 64;
+        ctx.save();
+        ctx.scale(scale, scale);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // Fork prongs & stem
+        ctx.beginPath();
+        ctx.moveTo(20, 12);
+        ctx.lineTo(20, 26);
+        ctx.arc(25, 26, 5, Math.PI, 0, true);
+        ctx.lineTo(30, 12);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(25, 12);
+        ctx.lineTo(25, 52);
+        ctx.stroke();
+
+        // Sync arrow loop
+        ctx.beginPath();
+        ctx.moveTo(40, 20);
+        ctx.lineTo(46, 14);
+        ctx.lineTo(52, 20);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(46, 14);
+        ctx.lineTo(46, 35);
+        ctx.arc(37, 35, 9, 0, Math.PI / 2, false);
+        ctx.lineTo(33, 44);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(38, 39);
+        ctx.lineTo(33, 44);
+        ctx.lineTo(38, 49);
+        ctx.stroke();
+        ctx.restore();
+
+        return canvas.toDataURL('image/png');
       } catch (err) {
-        console.warn('PWA manifest update skipped:', err);
+        return null;
+      }
+    }
+
+    /**
+     * Generates a valid Web App Manifest with 192x192 and 512x512 PNG icons
+     * and sets up the 180x180 Apple Touch Icon without needing separate files.
+     */
+    function injectDynamicPWAManifestAndIcons() {
+      const icon180 = renderKitchenSyncIconDataUrl(180);
+      const icon192 = renderKitchenSyncIconDataUrl(192);
+      const icon512 = renderKitchenSyncIconDataUrl(512);
+
+      if (icon180) {
+        const appleIconLink = document.getElementById('apple-touch-icon');
+        if (appleIconLink) appleIconLink.href = icon180;
+      }
+
+      try {
+        const icons = [];
+        if (icon192) icons.push({ src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' });
+        if (icon512) icons.push({ src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' });
+
+        const manifestObj = {
+          name: 'KitchenSync — Recipes, Meal Plan & Grocery List',
+          short_name: 'KitchenSync',
+          description: 'Manage household recipes, weekly meal plans, and synced personal & shared grocery lists.',
+          start_url: window.location.href,
+          scope: window.location.origin + window.location.pathname.replace(/[^/]*$/, ''),
+          display: 'standalone',
+          orientation: 'portrait-primary',
+          background_color: '#020617',
+          theme_color: '#10b981',
+          icons
+        };
+
+        const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        const manifestUrl = URL.createObjectURL(blob);
+        const manifestLink = document.getElementById('pwa-manifest-link');
+        if (manifestLink) manifestLink.href = manifestUrl;
+      } catch (err) {
+        // Safe fallback in restricted iframe contexts
+      }
+    }
+
+    async function registerOptionalServiceWorker() {
+      try {
+        if (!('serviceWorker' in navigator)) {
+          pwaState.swStatus = 'unavailable';
+          updateInstallUI();
+          return;
+        }
+        const proto = window.location.protocol;
+        if (proto !== 'https:' && proto !== 'http:') {
+          pwaState.swStatus = 'unavailable';
+          updateInstallUI();
+          return;
+        }
+        // Only register ./sw.js if it actually exists on the server so we never log a 404
+        const probe = await fetch('./sw.js', { method: 'HEAD' });
+        if (probe.ok) {
+          const reg = await navigator.serviceWorker.register('./sw.js');
+          pwaState.swStatus = reg ? 'active' : 'unavailable';
+        } else {
+          pwaState.swStatus = 'standalone-ready';
+        }
+      } catch (err) {
+        pwaState.swStatus = 'standalone-ready';
+      }
+      updateInstallUI();
+    }
+
+    function initPWAInstallability() {
+      injectDynamicPWAManifestAndIcons();
+
+      pwaState.isStandalone =
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+        window.navigator.standalone === true;
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        pwaState.deferredPrompt = e;
+        updateInstallUI();
+      });
+
+      window.addEventListener('appinstalled', () => {
+        pwaState.deferredPrompt = null;
+        pwaState.isStandalone = true;
+        updateInstallUI();
+        showToast('KitchenSync installed on your device!');
+      });
+
+      updateInstallUI();
+      registerOptionalServiceWorker();
+    }
+
+    async function handleInstallButtonClick() {
+      if (pwaState.deferredPrompt) {
+        try {
+          pwaState.deferredPrompt.prompt();
+          const { outcome } = await pwaState.deferredPrompt.userChoice;
+          pwaState.deferredPrompt = null;
+          if (outcome === 'accepted') {
+            pwaState.isStandalone = true;
+          }
+          updateInstallUI();
+          return;
+        } catch (err) {
+          // Fall back to instruction modal
+        }
+      }
+      openModal('install-guide-modal');
+    }
+
+    function updateInstallUI() {
+      const headerBtn = document.getElementById('header-install-btn');
+      if (headerBtn) {
+        headerBtn.classList.toggle('hidden', pwaState.isStandalone);
+      }
+
+      const swBadge = document.getElementById('pwa-sw-status-badge');
+      if (swBadge) {
+        if (pwaState.swStatus === 'active') {
+          swBadge.textContent = 'Offline Service Worker Active';
+          swBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30';
+        } else {
+          swBadge.textContent = 'PWA Manifest & Icons Ready';
+          swBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30';
+        }
+      }
+
+      const modeText = document.getElementById('pwa-mode-status-text');
+      const modalInstallBtn = document.getElementById('modal-install-action-btn');
+      if (modeText) {
+        modeText.textContent = pwaState.isStandalone
+          ? 'Installed App (Standalone Mode)'
+          : pwaState.deferredPrompt
+            ? 'Ready for One-Tap App Install'
+            : 'Running in Browser Tab';
+      }
+      if (modalInstallBtn) {
+        modalInstallBtn.classList.toggle('hidden', pwaState.isStandalone);
+        modalInstallBtn.textContent = pwaState.deferredPrompt ? 'Install App Now' : 'Install / Home Screen Guide';
       }
     }
 
@@ -1141,20 +1426,16 @@ const DEFAULT_FIREBASE_CONFIG = {
       'Drinks & Household'
     ];
 
-    const LEGACY_AISLE_MAP = {
-      'Dairy & Eggs': 'Dairy & Chilled',
-      'Cupboard & Tins': 'Tins & Jars',
-      'Bakery & Grains': 'Dry Goods & Grains',
-      'Drinks & Snacks': 'Drinks & Household'
-    };
-
     function normalizeAisle(aisle, itemName = '') {
       if (AISLES.includes(aisle)) return aisle;
-      if (LEGACY_AISLE_MAP[aisle]) return LEGACY_AISLE_MAP[aisle];
+      const legacyMap = {
+        'Pantry & Tins': 'Tins & Jars',
+        'Grains & Pasta': 'Dry Goods & Grains',
+        'Drinks & Snacks': 'Drinks & Household'
+      };
+      if (legacyMap[aisle]) return legacyMap[aisle];
       return detectAisle(itemName);
     }
-
-    const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     const CORE_LISTS = [
       {
@@ -1163,7 +1444,7 @@ const DEFAULT_FIREBASE_CONFIG = {
         type: 'personal',
         icon: 'user',
         color: 'emerald',
-        description: 'Solo weekday meals & personal items'
+        description: 'Your private weekday meals & solo essentials'
       },
       {
         id: 'shared',
@@ -1171,691 +1452,516 @@ const DEFAULT_FIREBASE_CONFIG = {
         type: 'shared',
         icon: 'users',
         color: 'indigo',
-        description: 'Collective drinks, bulk tins & shared meals'
+        description: 'Collective flatmate shop — bulk tins, drinks & shared dinners'
       }
     ];
 
-    const SEED_SHOPPING_ITEMS = [
-      { id: 'seed_item_1', listId: 'personal', name: 'Salmon Fillets', qty: 2, unit: 'pcs', aisle: 'Meat & Fish', checked: false, sources: [] },
-      { id: 'seed_item_2', listId: 'personal', name: 'Chicken Breast', qty: 250, unit: 'g', aisle: 'Meat & Fish', checked: false, sources: [] },
-      { id: 'seed_item_3', listId: 'personal', name: 'Instant Ramen', qty: 1, unit: 'pack', aisle: 'Dry Goods & Grains', checked: false, sources: ['Wed Lunch'] },
-      { id: 'seed_item_4', listId: 'shared', name: 'Chopped Tomatoes', qty: 4, unit: 'tin', aisle: 'Tins & Jars', checked: false, sources: ['Bulk Staple'] },
-      { id: 'seed_item_5', listId: 'shared', name: 'Oat Milk', qty: 2, unit: 'l', aisle: 'Dairy & Chilled', checked: false, sources: ['Household'] },
-      { id: 'seed_item_6', listId: 'shared', name: 'Sparkling Water', qty: 6, unit: 'can', aisle: 'Drinks & Household', checked: false, sources: ['Household'] },
-      { id: 'seed_item_7', listId: 'shared', name: 'Olive Oil', qty: 1000, unit: 'ml', aisle: 'Tins & Jars', checked: false, sources: ['Household'] },
-      { id: 'seed_item_8', listId: 'shared', name: 'Basmati Rice', qty: 1000, unit: 'g', aisle: 'Dry Goods & Grains', checked: false, sources: ['Bulk Staple'] }
-    ];
+    const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    const SEED_PANTRY = [
-      'Basmati Rice',
-      'Jasmine Rice',
-      'Soy Sauce',
-      'Olive Oil',
-      'Garlic',
-      'Medium Curry Powder',
-      'Smoked Paprika',
-      'Black Pepper',
-      'Salt'
+    const CUSTOM_MEAL_PRESETS = [
+      { title: 'Quick Instant Ramen', items: '1 pack instant ramen, 2 eggs, spring onions' },
+      { title: 'Ready Meal', items: '1 ready meal' },
+      { title: 'Leftovers', items: '' },
+      { title: 'Beans on Toast', items: '1 tin baked beans, 1 loaf bread, butter' },
+      { title: 'Takeaway / Eating Out', items: '' }
     ];
 
     const SEED_RECIPES = [
       {
-        id: 'rec_katsu_01',
+        id: 'rec_katsu_curry',
         title: 'Chicken & Chickpea Katsu Curry',
         servings: 4,
-        prepTime: '40 mins',
-        tags: ['Batch Cook', 'Comfort'],
+        prepTime: '35 mins',
+        tags: ['Family Favourite', 'Batch Cook', 'Comfort'],
         ingredients: [
-          { name: 'Chicken breast fillets', amount: 500, unit: 'g', aisle: 'Meat & Fish' },
+          { name: 'Chicken Breast', amount: 500, unit: 'g', aisle: 'Meat & Fish' },
           { name: 'Chickpeas', amount: 1, unit: 'tin', aisle: 'Tins & Jars' },
-          { name: 'Brown onion', amount: 150, unit: 'g', aisle: 'Produce' },
-          { name: 'Carrots', amount: 160, unit: 'g', aisle: 'Produce' },
-          { name: 'Garlic', amount: 2, unit: 'pcs', aisle: 'Produce' },
-          { name: 'Medium Curry Powder', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' },
-          { name: 'Coconut milk', amount: 400, unit: 'ml', aisle: 'Tins & Jars' },
-          { name: 'Chicken stock', amount: 200, unit: 'ml', aisle: 'Tins & Jars' },
-          { name: 'Panko breadcrumbs', amount: 80, unit: 'g', aisle: 'Dry Goods & Grains' },
-          { name: 'Jasmine Rice', amount: 300, unit: 'g', aisle: 'Dry Goods & Grains' }
+          { name: 'Jasmine Rice', amount: 300, unit: 'g', aisle: 'Dry Goods & Grains' },
+          { name: 'Brown Onion', amount: 2, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Carrots', amount: 2, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Garlic Cloves', amount: 3, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Curry Powder', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Coconut Milk', amount: 400, unit: 'ml', aisle: 'Tins & Jars' },
+          { name: 'Panko Breadcrumbs', amount: 100, unit: 'g', aisle: 'Dry Goods & Grains' },
+          { name: 'Soy Sauce', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' }
         ],
         steps: [
-          'Fry finely diced brown onion, grated carrots, and crushed garlic in a saucepan for 8 minutes until softened.',
-          'Stir in medium curry powder for 1 minute, then pour in coconut milk, chicken stock, and drained chickpeas. Simmer gently for 15 minutes.',
-          'Coat flattened chicken breasts in seasoned flour, beaten egg (or milk), and panko breadcrumbs. Bake at 200°C (180°C fan) for 18–20 minutes until golden and crisp.',
-          'Rinse and simmer the jasmine rice according to pack instructions.',
-          'Slice the crispy chicken, ladle over the rich chickpea katsu sauce, and serve alongside steamed rice.'
+          'Finely slice the onions and carrots, then fry gently in 1 tbsp oil for 8 minutes until softened.',
+          'Stir in crushed garlic and curry powder for 1 minute, then pour in coconut milk, soy sauce, and drained chickpeas. Simmer for 15 minutes.',
+          'Meanwhile, cook the jasmine rice according to packet instructions.',
+          'Coat sliced chicken breasts in flour, beaten egg, and panko breadcrumbs; pan-fry or air-fry at 200°C for 14 minutes until golden and crisp.',
+          'Blend the katsu sauce until velvety smooth, slice the crispy chicken, and serve over steamed rice.'
         ]
       },
       {
-        id: 'rec_gapao_02',
+        id: 'rec_gapao_rice',
         title: 'Japanese Gapao Rice (Thai Basil Chicken Mince)',
         servings: 2,
         prepTime: '20 mins',
-        tags: ['Quick', 'High Protein'],
+        tags: ['Quick', 'High Protein', 'Weeknight'],
         ingredients: [
-          { name: 'Chicken breast mince', amount: 300, unit: 'g', aisle: 'Meat & Fish' },
-          { name: 'Red bell pepper', amount: 150, unit: 'g', aisle: 'Produce' },
-          { name: 'Garlic', amount: 2, unit: 'pcs', aisle: 'Produce' },
-          { name: 'Red chilli', amount: 1, unit: 'pcs', aisle: 'Produce' },
-          { name: 'Fresh basil leaves', amount: 30, unit: 'g', aisle: 'Produce' },
-          { name: 'Soy Sauce', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' },
-          { name: 'Oyster sauce', amount: 1.5, unit: 'tbsp', aisle: 'Spices & Condiments' },
-          { name: 'Eggs', amount: 2, unit: 'pcs', aisle: 'Dairy & Chilled' },
-          { name: 'Jasmine Rice', amount: 160, unit: 'g', aisle: 'Dry Goods & Grains' }
+          { name: 'Chicken Mince', amount: 350, unit: 'g', aisle: 'Meat & Fish' },
+          { name: 'Jasmine Rice', amount: 200, unit: 'g', aisle: 'Dry Goods & Grains' },
+          { name: 'Red Bell Pepper', amount: 1, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Fresh Basil', amount: 30, unit: 'g', aisle: 'Produce' },
+          { name: 'Garlic Cloves', amount: 2, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Red Chilli', amount: 1, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Oyster Sauce', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Soy Sauce', amount: 1, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Eggs', amount: 2, unit: 'pcs', aisle: 'Dairy & Chilled' }
         ],
         steps: [
-          'Cook the jasmine rice so it is hot and fluffy when the stir-fry finishes.',
-          'Fry minced garlic and sliced red chilli in 1 tbsp oil over high heat for 30 seconds until fragrant.',
-          'Add chicken mince and stir-fry for 5–6 minutes until browned, breaking up any clumps.',
-          'Toss in finely diced red bell pepper, soy sauce, and oyster sauce. Stir-fry for 2 minutes, then fold through fresh basil leaves until wilted.',
-          'Fry two eggs in a separate pan until crisp-edged with runny yolks, and serve on top of the gapao chicken and rice.'
+          'Steam or boil the jasmine rice until fluffy.',
+          'Heat oil in a hot wok, fry minced garlic and sliced chilli for 30 seconds, then add chicken mince and stir-fry until browned.',
+          'Toss in diced red bell pepper, oyster sauce, soy sauce, and a pinch of sugar; cook for 3 minutes.',
+          'Turn off the heat and fold through torn fresh basil leaves until wilted.',
+          'Fry two sunny-side-up eggs with crispy edges and serve on top of the rice and savoury mince.'
         ]
       },
       {
-        id: 'rec_salmon_03',
+        id: 'rec_sweet_chilli_salmon',
         title: 'Sweet Chilli Glazed Salmon with Jasmine Rice',
         servings: 2,
         prepTime: '25 mins',
-        tags: ['Quick', 'Fish'],
+        tags: ['Quick', 'Fish', 'Healthy'],
         ingredients: [
           { name: 'Salmon Fillets', amount: 2, unit: 'pcs', aisle: 'Meat & Fish' },
-          { name: 'Sweet chilli sauce', amount: 3, unit: 'tbsp', aisle: 'Spices & Condiments' },
+          { name: 'Jasmine Rice', amount: 180, unit: 'g', aisle: 'Dry Goods & Grains' },
+          { name: 'Tenderstem Broccoli', amount: 200, unit: 'g', aisle: 'Produce' },
+          { name: 'Sweet Chilli Sauce', amount: 3, unit: 'tbsp', aisle: 'Spices & Condiments' },
           { name: 'Soy Sauce', amount: 1, unit: 'tbsp', aisle: 'Spices & Condiments' },
-          { name: 'Tenderstem broccoli', amount: 180, unit: 'g', aisle: 'Produce' },
-          { name: 'Spring onions', amount: 40, unit: 'g', aisle: 'Produce' },
-          { name: 'Lime', amount: 1, unit: 'pcs', aisle: 'Produce' },
-          { name: 'Jasmine Rice', amount: 150, unit: 'g', aisle: 'Dry Goods & Grains' }
+          { name: 'Lime', amount: 1, unit: 'pcs', aisle: 'Produce' }
         ],
         steps: [
-          'Preheat the oven to 200°C (180°C fan). Place salmon fillets on a lined baking tray and glaze generously with sweet chilli sauce and soy sauce.',
-          'Roast the salmon for 12–14 minutes until flaky and caramelised.',
-          'Simmer the jasmine rice in salted water for 12 minutes until tender.',
-          'Steam or pan-fry the tenderstem broccoli for 4 minutes until tender-crisp.',
-          'Fluff the rice with lime juice and sliced spring onions, and serve with the glazed salmon and broccoli.'
+          'Rinse jasmine rice and simmer in salted water for 12 minutes until tender.',
+          'Whisk sweet chilli sauce, soy sauce, and the juice of half a lime in a small bowl.',
+          'Pan-sear salmon fillets skin-side down for 4 minutes, flip, brush generously with the sweet chilli glaze, and cook 3 more minutes until caramelised.',
+          'Steam tenderstem broccoli for 4 minutes and serve alongside the glazed salmon, rice, and extra lime wedges.'
         ]
       },
       {
-        id: 'rec_goulash_04',
+        id: 'rec_sausage_goulash',
         title: 'Smoky Sausage & Paprika Goulash',
         servings: 4,
         prepTime: '35 mins',
-        tags: ['Batch Cook', 'One-Pot'],
+        tags: ['One-Pot', 'Comfort', 'Budget'],
         ingredients: [
-          { name: 'Pork sausages', amount: 450, unit: 'g', aisle: 'Meat & Fish' },
-          { name: 'Brown onion', amount: 200, unit: 'g', aisle: 'Produce' },
-          { name: 'Red bell pepper', amount: 150, unit: 'g', aisle: 'Produce' },
-          { name: 'Garlic', amount: 3, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Pork Sausages', amount: 450, unit: 'g', aisle: 'Meat & Fish' },
+          { name: 'Chopped Tomatoes', amount: 2, unit: 'tin', aisle: 'Tins & Jars' },
+          { name: 'Red Bell Pepper', amount: 2, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Brown Onion', amount: 1, unit: 'pcs', aisle: 'Produce' },
+          { name: 'Garlic Cloves', amount: 2, unit: 'pcs', aisle: 'Produce' },
           { name: 'Smoked Paprika', amount: 2, unit: 'tbsp', aisle: 'Spices & Condiments' },
-          { name: 'Chopped Tomatoes', amount: 1, unit: 'tin', aisle: 'Tins & Jars' },
-          { name: 'Chicken stock', amount: 250, unit: 'ml', aisle: 'Tins & Jars' },
-          { name: 'Soured cream', amount: 100, unit: 'ml', aisle: 'Dairy & Chilled' },
-          { name: 'Crusty sourdough loaf', amount: 1, unit: 'pcs', aisle: 'Bakery' }
+          { name: 'Fusilli Pasta', amount: 300, unit: 'g', aisle: 'Dry Goods & Grains' },
+          { name: 'Sour Cream', amount: 150, unit: 'ml', aisle: 'Dairy & Chilled' }
         ],
         steps: [
-          'Heat 1 tbsp olive oil in a heavy casserole pot and brown the pork sausages all over for 6–8 minutes. Slice into thick chunks.',
-          'Soften sliced brown onion and diced red bell pepper in the same pot for 6 minutes.',
-          'Stir in crushed garlic and smoked paprika for 1 minute until aromatic.',
-          'Pour in chopped tomatoes, chicken stock, and sliced sausages. Simmer gently for 15 minutes until rich and glossy.',
-          'Swirl through the soured cream off the heat and serve with thick slices of crusty sourdough.'
+          'Brown the pork sausages in a large deep casserole pan over medium-high heat for 6 minutes, then slice into bite-sized chunks.',
+          'Add sliced onion and bell peppers to the pan and soften for 5 minutes.',
+          'Stir in crushed garlic and smoked paprika for 1 minute, then tip in the chopped tomatoes plus 200ml water.',
+          'Simmer gently for 15 minutes while boiling the fusilli pasta in salted water.',
+          'Toss the drained pasta into the rich smoky goulash and finish with a swirl of sour cream.'
         ]
       }
     ];
 
-    const CUSTOM_MEAL_PRESETS = [
-      { title: 'Quick Instant Ramen', items: '1 pack instant ramen, 2 eggs, spring onions' },
-      { title: 'Ready Meal', items: '1 chilled ready meal' },
-      { title: 'Leftovers', items: '' },
-      { title: 'Beans on Toast', items: '1 tin baked beans, 1 loaf bread, cheddar cheese' },
-      { title: 'Takeaway / Eating Out', items: '' }
+    const SEED_PANTRY = [
+      'Jasmine Rice',
+      'Olive Oil',
+      'Soy Sauce',
+      'Garlic Cloves',
+      'Smoked Paprika',
+      'Salt',
+      'Black Pepper'
+    ];
+
+    const SEED_SHOPPING_ITEMS = [
+      {
+        id: 'item_seed_1',
+        listId: 'personal',
+        name: 'Salmon Fillets',
+        qty: 2,
+        unit: 'pcs',
+        aisle: 'Meat & Fish',
+        checked: false,
+        sources: ['Sweet Chilli Glazed Salmon']
+      },
+      {
+        id: 'item_seed_2',
+        listId: 'personal',
+        name: 'Tenderstem Broccoli',
+        qty: 200,
+        unit: 'g',
+        aisle: 'Produce',
+        checked: false,
+        sources: ['Sweet Chilli Glazed Salmon']
+      },
+      {
+        id: 'item_seed_3',
+        listId: 'shared',
+        name: 'Chopped Tomatoes',
+        qty: 4,
+        unit: 'tin',
+        aisle: 'Tins & Jars',
+        checked: false,
+        sources: ['Household Bulk']
+      },
+      {
+        id: 'item_seed_4',
+        listId: 'shared',
+        name: 'Oat Milk',
+        qty: 2,
+        unit: 'l',
+        aisle: 'Dairy & Chilled',
+        checked: false,
+        sources: []
+      },
+      {
+        id: 'item_seed_5',
+        listId: 'shared',
+        name: 'Sparkling Water',
+        qty: 6,
+        unit: 'can',
+        aisle: 'Drinks & Household',
+        checked: false,
+        sources: []
+      }
     ];
 
     /**
      * =========================================================================
-     * 3. KITCHENSYNC LOCAL STORAGE LAYER & AUTOMATIC LEGACY MIGRATION
+     * 3. APPLICATION STATE & LOCALSTORAGE PERSISTENCE LAYER
      * =========================================================================
      */
-    class KitchenSyncDB {
-      constructor() {
-        this.prefix = 'kitchensync_';
-      }
-
-      get(key, fallback) {
-        try {
-          const raw = localStorage.getItem(this.prefix + key);
-          return raw !== null ? JSON.parse(raw) : fallback;
-        } catch (err) {
-          console.error(`KitchenSyncDB read error [${key}]:`, err);
-          return fallback;
-        }
-      }
-
-      set(key, value) {
-        try {
-          localStorage.setItem(this.prefix + key, JSON.stringify(value));
-        } catch (err) {
-          console.error(`KitchenSyncDB write error [${key}]:`, err);
-          showToast('Local storage full — consider exporting a JSON backup.', 'error');
-        }
-      }
-
-      runMigrationIfNeeded() {
-        if (localStorage.getItem(this.prefix + 'migrated_v3') === 'true') return;
-
-        let migratedLists = null;
-        let migratedRecipes = [];
-        let migratedPantry = [];
-        let migratedMealPlan = {};
-        let migratedItems = [];
-
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (!k || k === THEME_STORAGE_KEY || k === FB_CONFIG_STORAGE_KEY || k === HOUSEHOLD_CODE_STORAGE_KEY) continue;
-
-          if (k.startsWith('kitchensync_v2_') || k.startsWith('pantrysync_') || k.startsWith('ps_')) {
-            try {
-              const parsed = JSON.parse(localStorage.getItem(k));
-              if (k.endsWith('_lists') && Array.isArray(parsed)) {
-                migratedLists = parsed;
-              } else if (k.endsWith('_recipes') && Array.isArray(parsed)) {
-                migratedRecipes = parsed;
-              } else if ((k.endsWith('_pantryStaples') || k.endsWith('_pantry')) && Array.isArray(parsed)) {
-                migratedPantry = parsed;
-              } else if (k.endsWith('_mealPlan') && parsed && typeof parsed === 'object') {
-                migratedMealPlan = parsed;
-              } else if ((k.endsWith('_shoppingList') || k.endsWith('_shoppingItems')) && Array.isArray(parsed)) {
-                migratedItems = parsed;
-              }
-            } catch (_) {}
-          }
-        }
-
-        if (localStorage.getItem(this.prefix + 'lists') === null) {
-          this.set('lists', migratedLists || JSON.parse(JSON.stringify(CORE_LISTS)));
-        }
-
-        if (localStorage.getItem(this.prefix + 'shoppingItems') === null) {
-          if (migratedItems.length > 0) {
-            const converted = migratedItems.map((item, idx) => ({
-              id: item.id || `mig_item_${Date.now()}_${idx}`,
-              listId: item.listId || 'personal',
-              name: item.name || 'Item',
-              qty: Number(item.qty ?? item.amount) || 1,
-              unit: item.unit || 'pcs',
-              aisle: normalizeAisle(item.aisle || item.category, item.name || ''),
-              checked: !!item.checked,
-              sources: Array.isArray(item.sources) ? item.sources : []
-            }));
-            this.set('shoppingItems', converted);
-          } else {
-            this.set('shoppingItems', JSON.parse(JSON.stringify(SEED_SHOPPING_ITEMS)));
-          }
-        }
-
-        if (localStorage.getItem(this.prefix + 'recipes') === null) {
-          const mergedRecipes = JSON.parse(JSON.stringify(SEED_RECIPES));
-          migratedRecipes.forEach(r => {
-            if (r && r.title && !mergedRecipes.some(sr => sr.title.toLowerCase() === r.title.toLowerCase())) {
-              mergedRecipes.push({
-                ...r,
-                ingredients: (r.ingredients || []).map(ing => ({
-                  name: ing.name,
-                  amount: Number(ing.amount) || 1,
-                  unit: ing.unit || 'pcs',
-                  aisle: normalizeAisle(ing.aisle || ing.category, ing.name || '')
-                }))
-              });
-            }
-          });
-          this.set('recipes', mergedRecipes);
-        }
-
-        if (localStorage.getItem(this.prefix + 'pantry') === null) {
-          const combinedPantry = Array.from(new Set([...SEED_PANTRY, ...migratedPantry]));
-          this.set('pantry', combinedPantry);
-        }
-
-        if (localStorage.getItem(this.prefix + 'mealPlan') === null) {
-          const cleanPlan = {};
-          DAYS_OF_WEEK.forEach(day => {
-            const rawDay = migratedMealPlan[day];
-            if (Array.isArray(rawDay)) {
-              cleanPlan[day] = rawDay.map((m, idx) => ({
-                id: m.id || `meal_${day}_${idx}_${Date.now()}`,
-                type: m.type || 'recipe',
-                scope: m.scope === 'shared' ? 'shared' : 'personal',
-                label: m.label || 'Dinner',
-                recipeId: m.recipeId || '',
-                servings: Number(m.servings) || 2,
-                title: m.title || '',
-                groceryItemsRaw: m.groceryItemsRaw || ''
-              }));
-            } else {
-              cleanPlan[day] = [];
-            }
-          });
-          this.set('mealPlan', cleanPlan);
-        }
-
-        localStorage.setItem(this.prefix + 'migrated_v3', 'true');
-      }
-    }
-
-    const db = new KitchenSyncDB();
-
-    /**
-     * =========================================================================
-     * 4. APPLICATION STATE & FIREBASE CLOUD SYNC ENGINE
-     * =========================================================================
-     */
-    let state = {
+    const state = {
       activeTab: 'grocery',
       activeListId: 'personal',
-      groceryViewMode: 'aisle',
+      groceryViewMode: 'aisle', // 'aisle' | 'flat'
+      collapsedAisles: {},
+      openMoveMenuItemId: null,
       selectedRecipeTag: 'All',
-      lists: [],
-      shoppingItems: [],
-      recipes: [],
-      mealPlan: {},
-      pantry: [],
       activeRecipeDetailId: null,
       detailMultiplier: 1,
       detailCheckedSteps: {},
       detailGlobalListId: 'personal',
       detailIngListOverrides: {},
-      collapsedAisles: {},
-      openMoveMenuItemId: null
+      lists: [],
+      shoppingItems: [],
+      recipes: [],
+      pantry: [],
+      mealPlan: {}
     };
 
+    const db = {
+      prefix: 'kitchensync_',
+      get(key, fallback) {
+        try {
+          const raw = localStorage.getItem(this.prefix + key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (e) {
+          return fallback;
+        }
+      },
+      set(key, val) {
+        try {
+          localStorage.setItem(this.prefix + key, JSON.stringify(val));
+        } catch (e) {
+          console.warn('localStorage write failed:', e);
+        }
+      },
+      runMigrationIfNeeded() {
+        try {
+          if (localStorage.getItem('kitchensync_migrated_v2')) return;
+          ['pantrysync_', 'ps_'].forEach(oldPrefix => {
+            ['lists', 'shoppingItems', 'recipes', 'pantry', 'mealPlan'].forEach(k => {
+              const oldVal = localStorage.getItem(oldPrefix + k);
+              if (oldVal && !localStorage.getItem(this.prefix + k)) {
+                localStorage.setItem(this.prefix + k, oldVal);
+              }
+            });
+          });
+          localStorage.setItem('kitchensync_migrated_v2', '1');
+        } catch (e) {}
+      }
+    };
+
+    /**
+     * =========================================================================
+     * 4. FIREBASE AUTHENTICATION & REAL-TIME FIRESTORE CLOUD SYNC ENGINE
+     * =========================================================================
+     */
     const cloud = {
+      config: null,
       app: null,
       auth: null,
       firestore: null,
-      config: null,
-      configSource: null, // 'code' | 'localStorage' | null
       user: null,
       householdCode: '',
-      status: 'local', // 'local' | 'connecting' | 'synced' | 'error'
-      unsubHousehold: null,
-      unsubPrivate: null,
-      isApplyingRemoteHousehold: false,
-      isApplyingRemotePrivate: false,
-      privateSaveTimer: null
+      unsubUserDoc: null,
+      unsubHouseholdDoc: null,
+      privateSyncTimer: null,
+      isApplyingRemote: false
     };
 
-    function sanitizeHouseholdCode(raw) {
-      return String(raw || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9-]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .slice(0, 48);
+    function getActiveFirebaseConfig() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(FB_CONFIG_STORAGE_KEY) || 'null');
+        if (saved && typeof saved === 'object' && saved.apiKey && saved.projectId) {
+          return saved;
+        }
+      } catch (e) {}
+      if (DEFAULT_FIREBASE_CONFIG && DEFAULT_FIREBASE_CONFIG.apiKey && DEFAULT_FIREBASE_CONFIG.projectId) {
+        return DEFAULT_FIREBASE_CONFIG;
+      }
+      return null;
     }
 
     function parseFirebaseConfigInput(rawText) {
-      const cleaned = String(rawText || '').trim();
+      const cleaned = (rawText || '').trim();
       if (!cleaned) return null;
 
-      // First try direct JSON parse
       try {
         const direct = JSON.parse(cleaned);
-        if (direct && typeof direct === 'object' && direct.apiKey && direct.projectId) {
-          return direct;
-        }
+        if (direct && direct.apiKey && direct.projectId) return direct;
       } catch (_) {}
 
-      // Extract the `{ ... }` object literal from a JS snippet like `const firebaseConfig = { ... };`
-      const firstBrace = cleaned.indexOf('{');
-      const lastBrace = cleaned.lastIndexOf('}');
-      if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) return null;
-
-      let objStr = cleaned.slice(firstBrace, lastBrace + 1);
-      // Convert single-quoted values to double-quoted and quote unquoted JS property keys
-      objStr = objStr
-        .replace(/\/\/.*$/gm, '')
-        .replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/'([^'\\]*(?:\\.[^'\\]*)*)'/g, '"$1"')
-        .replace(/([{,]\s*)([a-zA-Z0-9_$]+)\s*:/g, '$1"$2":')
-        .replace(/,\s*([}\]])/g, '$1');
+      const braceMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (!braceMatch) return null;
 
       try {
-        const parsed = JSON.parse(objStr);
-        if (parsed && typeof parsed === 'object' && parsed.apiKey && parsed.projectId) {
-          return parsed;
-        }
+        const jsonified = braceMatch[0]
+          .replace(/\/\/.*$/gm, '')
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/([{,]\s*)([a-zA-Z0-9_$]+)\s*:/g, '$1"$2":')
+          .replace(/'([^']*)'/g, '"$1"')
+          .replace(/,\s*([}\]])/g, '$1');
+        const parsed = JSON.parse(jsonified);
+        if (parsed && parsed.apiKey && parsed.projectId) return parsed;
       } catch (_) {}
 
       return null;
     }
 
-    function loadActiveFirebaseConfig() {
-      if (DEFAULT_FIREBASE_CONFIG && typeof DEFAULT_FIREBASE_CONFIG === 'object' && DEFAULT_FIREBASE_CONFIG.apiKey) {
-        cloud.config = DEFAULT_FIREBASE_CONFIG;
-        cloud.configSource = 'code';
-        return;
+    function sanitizeHouseholdCode(raw) {
+      return (raw || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-_]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    }
+
+    function detachFirestoreListeners() {
+      if (typeof cloud.unsubUserDoc === 'function') {
+        cloud.unsubUserDoc();
+        cloud.unsubUserDoc = null;
       }
-      try {
-        const saved = localStorage.getItem(FB_CONFIG_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && parsed.apiKey && parsed.projectId) {
-            cloud.config = parsed;
-            cloud.configSource = 'localStorage';
-            return;
-          }
-        }
-      } catch (_) {}
-      cloud.config = null;
-      cloud.configSource = null;
+      if (typeof cloud.unsubHouseholdDoc === 'function') {
+        cloud.unsubHouseholdDoc();
+        cloud.unsubHouseholdDoc = null;
+      }
     }
 
     async function initFirebaseEngine() {
-      loadActiveFirebaseConfig();
+      detachFirestoreListeners();
 
-      // Check URL ?household= invite parameter first, then localStorage
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlHousehold = sanitizeHouseholdCode(urlParams.get('household'));
-      if (urlHousehold) {
-        cloud.householdCode = urlHousehold;
-        try {
-          localStorage.setItem(HOUSEHOLD_CODE_STORAGE_KEY, urlHousehold);
-        } catch (_) {}
-      } else {
-        try {
+      // Check URL ?household= invite parameter
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const urlCode = sanitizeHouseholdCode(params.get('household') || '');
+        if (urlCode) {
+          cloud.householdCode = urlCode;
+          localStorage.setItem(HOUSEHOLD_CODE_STORAGE_KEY, urlCode);
+          window.history.replaceState({}, '', `${window.location.origin}${window.location.pathname}`);
+        } else {
           cloud.householdCode = sanitizeHouseholdCode(localStorage.getItem(HOUSEHOLD_CODE_STORAGE_KEY) || '');
-        } catch (_) {}
-      }
+        }
+      } catch (_) {}
 
+      const hhInput = document.getElementById('household-code-input');
+      if (hhInput && cloud.householdCode) hhInput.value = cloud.householdCode;
+
+      cloud.config = getActiveFirebaseConfig();
       if (!cloud.config) {
-        cloud.status = 'local';
+        cloud.app = null;
+        cloud.auth = null;
+        cloud.firestore = null;
+        cloud.user = null;
         updateCloudSyncUI();
         return;
       }
 
       try {
-        cloud.status = 'connecting';
-        updateCloudSyncUI();
-
-        // Clean up any prior app instance if reconfiguring at runtime
-        const existingApps = getApps();
-        for (const a of existingApps) {
-          await deleteApp(a);
+        if (getApps().length > 0) {
+          for (const existingApp of getApps()) {
+            await deleteApp(existingApp);
+          }
         }
-
         cloud.app = initializeApp(cloud.config);
         cloud.auth = getAuth(cloud.app);
         cloud.firestore = getFirestore(cloud.app);
 
-        // Handle redirect sign-in completion if popup fell back to redirect
         getRedirectResult(cloud.auth).catch(err => {
-          if (err && err.code) {
-            handleFirebaseAuthError(err);
-          }
+          if (err) handleFirebaseAuthError(err);
         });
 
         onAuthStateChanged(cloud.auth, async (user) => {
           cloud.user = user || null;
           detachFirestoreListeners();
+          updateCloudSyncUI();
 
-          if (user) {
-            cloud.status = 'connecting';
-            updateCloudSyncUI();
-            await attachPrivateCloudSync(user);
+          if (user && cloud.firestore) {
+            await attachUserCloudSync(user);
             if (cloud.householdCode) {
               await attachHouseholdCloudSync(user, cloud.householdCode);
-            } else {
-              cloud.status = 'synced';
-              updateCloudSyncUI();
             }
-          } else {
-            cloud.status = 'local';
-            updateCloudSyncUI();
           }
         });
       } catch (err) {
-        console.error('Firebase initialization failed:', err);
-        cloud.status = 'error';
-        updateCloudSyncUI();
-        showToast('Could not initialize Firebase — check your firebaseConfig.', 'error');
+        console.error('Firebase init error:', err);
+        showToast(`Firebase init error: ${err.message}`, 'error');
       }
+
+      updateCloudSyncUI();
     }
 
-    function detachFirestoreListeners() {
-      if (typeof cloud.unsubHousehold === 'function') {
-        cloud.unsubHousehold();
-        cloud.unsubHousehold = null;
+    async function attachUserCloudSync(user) {
+      if (!cloud.firestore || !user) return;
+      const userDocRef = doc(cloud.firestore, 'users', user.uid, 'data', 'private');
+
+      try {
+        const initialSnap = await getDoc(userDocRef);
+        if (!initialSnap.exists()) {
+          // Seed cloud with local personal data on first login
+          await pushPrivateToCloudNow();
+        }
+      } catch (err) {
+        console.warn('Initial private doc check warning:', err);
       }
-      if (typeof cloud.unsubPrivate === 'function') {
-        cloud.unsubPrivate();
-        cloud.unsubPrivate = null;
-      }
+
+      cloud.unsubUserDoc = onSnapshot(userDocRef, (snap) => {
+        if (!snap.exists()) return;
+        const remote = snap.data();
+        cloud.isApplyingRemote = true;
+        try {
+          if (Array.isArray(remote.lists) && remote.lists.length > 0) {
+            state.lists = remote.lists;
+            db.set('lists', state.lists);
+          }
+          if (Array.isArray(remote.privateShoppingItems)) {
+            const sharedOnly = state.shoppingItems.filter(i => i.listId === 'shared');
+            state.shoppingItems = [...sharedOnly, ...remote.privateShoppingItems];
+            db.set('shoppingItems', state.shoppingItems);
+          }
+          if (Array.isArray(remote.recipes)) {
+            state.recipes = remote.recipes;
+            db.set('recipes', state.recipes);
+          }
+          if (Array.isArray(remote.pantry)) {
+            state.pantry = remote.pantry;
+            db.set('pantry', state.pantry);
+          }
+          if (remote.mealPlan && typeof remote.mealPlan === 'object') {
+            state.mealPlan = remote.mealPlan;
+            DAYS_OF_WEEK.forEach(d => {
+              if (!Array.isArray(state.mealPlan[d])) state.mealPlan[d] = [];
+            });
+            db.set('mealPlan', state.mealPlan);
+          }
+          updateAllBadges();
+          if (state.activeTab === 'grocery') renderGroceryView();
+          if (state.activeTab === 'recipes') renderRecipes();
+          if (state.activeTab === 'planner') renderMealPlanner();
+          if (state.activeTab === 'pantry') renderPantry();
+        } finally {
+          cloud.isApplyingRemote = false;
+        }
+      }, (err) => {
+        console.warn('Private Firestore listener error:', err);
+      });
     }
 
-    /**
-     * Subscribes to `households/{code}/shared/grocery` for real-time housemate sync.
-     * Merges local Shared Household items on first connect, then applies live snapshots.
-     */
     async function attachHouseholdCloudSync(user, code) {
       if (!cloud.firestore || !user || !code) return;
-      if (typeof cloud.unsubHousehold === 'function') {
-        cloud.unsubHousehold();
-        cloud.unsubHousehold = null;
+      if (typeof cloud.unsubHouseholdDoc === 'function') {
+        cloud.unsubHouseholdDoc();
+        cloud.unsubHouseholdDoc = null;
       }
 
-      cloud.status = 'connecting';
+      const hhDocRef = doc(cloud.firestore, 'households', code, 'data', 'shared');
+
+      try {
+        const snap = await getDoc(hhDocRef);
+        if (!snap.exists()) {
+          await pushSharedItemsToCloud();
+        }
+      } catch (err) {
+        console.warn('Initial household doc check warning:', err);
+      }
+
+      cloud.unsubHouseholdDoc = onSnapshot(hhDocRef, (snap) => {
+        if (!snap.exists()) return;
+        const remote = snap.data();
+        if (!Array.isArray(remote.sharedShoppingItems)) return;
+
+        cloud.isApplyingRemote = true;
+        try {
+          const nonShared = state.shoppingItems.filter(i => i.listId !== 'shared');
+          state.shoppingItems = [...nonShared, ...remote.sharedShoppingItems];
+          db.set('shoppingItems', state.shoppingItems);
+          updateAllBadges();
+          if (state.activeTab === 'grocery') renderGroceryView();
+        } finally {
+          cloud.isApplyingRemote = false;
+        }
+      }, (err) => {
+        console.warn('Household Firestore listener error:', err);
+        showToast('Firestore permission error — check your Firestore Security Rules.', 'error');
+      });
+
       updateCloudSyncUI();
-
-      const householdRef = doc(cloud.firestore, 'households', code, 'shared', 'grocery');
-
-      try {
-        const initialSnap = await getDoc(householdRef);
-        const localShared = state.shoppingItems.filter(i => i.listId === 'shared');
-
-        if (initialSnap.exists()) {
-          const remoteItems = Array.isArray(initialSnap.data().items) ? initialSnap.data().items : [];
-          // Merge any local shared items not present in remote cloud list
-          const merged = [...remoteItems];
-          let addedFromLocal = false;
-
-          localShared.forEach(loc => {
-            const existsInRemote = merged.some(rem =>
-              !rem.checked &&
-              !loc.checked &&
-              rem.name.trim().toLowerCase() === loc.name.trim().toLowerCase() &&
-              rem.unit === loc.unit
-            );
-            if (!existsInRemote && !merged.some(rem => rem.id === loc.id)) {
-              merged.push({ ...loc, listId: 'shared' });
-              addedFromLocal = true;
-            }
-          });
-
-          cloud.isApplyingRemoteHousehold = true;
-          const nonShared = state.shoppingItems.filter(i => i.listId !== 'shared');
-          state.shoppingItems = [
-            ...nonShared,
-            ...merged.map(m => ({ ...m, listId: 'shared', aisle: normalizeAisle(m.aisle, m.name) }))
-          ];
-          db.set('shoppingItems', state.shoppingItems);
-          updateAllBadges();
-          if (state.activeTab === 'grocery') renderGroceryView();
-          cloud.isApplyingRemoteHousehold = false;
-
-          if (addedFromLocal) {
-            await setDoc(householdRef, {
-              items: state.shoppingItems.filter(i => i.listId === 'shared'),
-              updatedAt: serverTimestamp(),
-              updatedBy: user.uid
-            }, { merge: true });
-          }
-        } else {
-          // Seed new household room with current local Shared Household list
-          await setDoc(householdRef, {
-            items: localShared,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-            updatedBy: user.uid
-          });
-        }
-
-        cloud.unsubHousehold = onSnapshot(householdRef, (snap) => {
-          if (!snap.exists() || snap.metadata.hasPendingWrites) return;
-          const data = snap.data();
-          const remoteShared = (Array.isArray(data.items) ? data.items : []).map(item => ({
-            ...item,
-            listId: 'shared',
-            aisle: normalizeAisle(item.aisle, item.name)
-          }));
-
-          cloud.isApplyingRemoteHousehold = true;
-          const nonShared = state.shoppingItems.filter(i => i.listId !== 'shared');
-          state.shoppingItems = [...nonShared, ...remoteShared];
-          db.set('shoppingItems', state.shoppingItems);
-          updateAllBadges();
-          if (state.activeTab === 'grocery') renderGroceryView();
-          cloud.isApplyingRemoteHousehold = false;
-
-          cloud.status = 'synced';
-          updateCloudSyncUI();
-        }, (err) => {
-          console.error('Household onSnapshot error:', err);
-          cloud.status = 'error';
-          updateCloudSyncUI();
-          showToast('Firestore permission error on household sync — check Security Rules.', 'error');
-        });
-
-        cloud.status = 'synced';
-        updateCloudSyncUI();
-      } catch (err) {
-        console.error('Failed to attach household sync:', err);
-        cloud.status = 'error';
-        updateCloudSyncUI();
-        showToast('Could not connect to household room — check Firestore Rules.', 'error');
-      }
     }
 
-    /**
-     * Subscribes to `users/{uid}/private/kitchenData` for personal multi-device sync
-     * (Personal & custom lists, recipes, mealPlan, and pantry).
-     */
-    async function attachPrivateCloudSync(user) {
-      if (!cloud.firestore || !user) return;
-      if (typeof cloud.unsubPrivate === 'function') {
-        cloud.unsubPrivate();
-        cloud.unsubPrivate = null;
-      }
-
-      const privateRef = doc(cloud.firestore, 'users', user.uid, 'private', 'kitchenData');
-
+    async function pushPrivateToCloudNow() {
+      if (cloud.isApplyingRemote || !cloud.firestore || !cloud.user) return;
+      const userDocRef = doc(cloud.firestore, 'users', cloud.user.uid, 'data', 'private');
+      const privateShoppingItems = state.shoppingItems.filter(i => i.listId !== 'shared');
       try {
-        const initialSnap = await getDoc(privateRef);
-        if (initialSnap.exists()) {
-          applyRemotePrivatePayload(initialSnap.data());
-        } else {
-          await pushPrivateStateNow();
-        }
-
-        cloud.unsubPrivate = onSnapshot(privateRef, (snap) => {
-          if (!snap.exists() || snap.metadata.hasPendingWrites) return;
-          applyRemotePrivatePayload(snap.data());
-        }, (err) => {
-          console.warn('Private cloud sync listener warning:', err);
-        });
-      } catch (err) {
-        console.warn('Private cloud sync skipped:', err);
-      }
-    }
-
-    function applyRemotePrivatePayload(data) {
-      if (!data || typeof data !== 'object') return;
-      cloud.isApplyingRemotePrivate = true;
-
-      if (Array.isArray(data.lists) && data.lists.length >= 2) {
-        state.lists = data.lists;
-        db.set('lists', state.lists);
-      }
-      if (Array.isArray(data.personalItems)) {
-        const sharedOnly = state.shoppingItems.filter(i => i.listId === 'shared');
-        const normalizedPersonal = data.personalItems
-          .filter(i => i.listId !== 'shared')
-          .map(i => ({ ...i, aisle: normalizeAisle(i.aisle, i.name) }));
-        state.shoppingItems = [...normalizedPersonal, ...sharedOnly];
-        db.set('shoppingItems', state.shoppingItems);
-      }
-      if (Array.isArray(data.recipes) && data.recipes.length > 0) {
-        state.recipes = data.recipes.map(r => ({
-          ...r,
-          ingredients: (r.ingredients || []).map(ing => ({ ...ing, aisle: normalizeAisle(ing.aisle, ing.name) }))
-        }));
-        db.set('recipes', state.recipes);
-      }
-      if (Array.isArray(data.pantry)) {
-        state.pantry = data.pantry;
-        db.set('pantry', state.pantry);
-      }
-      if (data.mealPlan && typeof data.mealPlan === 'object') {
-        state.mealPlan = data.mealPlan;
-        DAYS_OF_WEEK.forEach(d => {
-          if (!Array.isArray(state.mealPlan[d])) state.mealPlan[d] = [];
-        });
-        db.set('mealPlan', state.mealPlan);
-      }
-
-      updateAllBadges();
-      if (state.activeTab === 'grocery') renderGroceryView();
-      if (state.activeTab === 'recipes') renderRecipes();
-      if (state.activeTab === 'planner') renderMealPlanner();
-      if (state.activeTab === 'pantry') renderPantry();
-
-      cloud.isApplyingRemotePrivate = false;
-    }
-
-    async function pushSharedItemsToCloud() {
-      if (cloud.isApplyingRemoteHousehold) return;
-      if (!cloud.firestore || !cloud.user || !cloud.householdCode) return;
-
-      try {
-        const householdRef = doc(cloud.firestore, 'households', cloud.householdCode, 'shared', 'grocery');
-        const sharedItems = state.shoppingItems.filter(i => i.listId === 'shared');
-        await setDoc(householdRef, {
-          items: sharedItems,
-          updatedAt: serverTimestamp(),
-          updatedBy: cloud.user.uid
+        await setDoc(userDocRef, {
+          lists: state.lists,
+          privateShoppingItems,
+          recipes: state.recipes,
+          pantry: state.pantry,
+          mealPlan: state.mealPlan,
+          updatedAt: serverTimestamp()
         }, { merge: true });
       } catch (err) {
-        console.error('Error syncing Shared Household items:', err);
+        console.warn('Private cloud push failed:', err);
       }
     }
 
     function schedulePushPrivateToCloud() {
-      if (cloud.isApplyingRemotePrivate) return;
-      if (!cloud.firestore || !cloud.user) return;
-
-      clearTimeout(cloud.privateSaveTimer);
-      cloud.privateSaveTimer = setTimeout(() => {
-        pushPrivateStateNow();
-      }, 600);
+      if (cloud.isApplyingRemote || !cloud.firestore || !cloud.user) return;
+      clearTimeout(cloud.privateSyncTimer);
+      cloud.privateSyncTimer = setTimeout(() => {
+        pushPrivateToCloudNow();
+      }, 350);
     }
 
-    async function pushPrivateStateNow() {
-      if (!cloud.firestore || !cloud.user) return;
+    async function pushSharedItemsToCloud() {
+      if (cloud.isApplyingRemote || !cloud.firestore || !cloud.user || !cloud.householdCode) return;
+      const hhDocRef = doc(cloud.firestore, 'households', cloud.householdCode, 'data', 'shared');
+      const sharedShoppingItems = state.shoppingItems.filter(i => i.listId === 'shared');
       try {
-        const privateRef = doc(cloud.firestore, 'users', cloud.user.uid, 'private', 'kitchenData');
-        const personalItems = state.shoppingItems.filter(i => i.listId !== 'shared');
-        await setDoc(privateRef, {
-          lists: state.lists,
-          personalItems,
-          recipes: state.recipes,
-          mealPlan: state.mealPlan,
-          pantry: state.pantry,
+        await setDoc(hhDocRef, {
+          sharedShoppingItems,
+          updatedBy: cloud.user.uid,
           updatedAt: serverTimestamp()
         }, { merge: true });
       } catch (err) {
-        console.warn('Error saving private cloud backup:', err);
+        console.warn('Shared household push failed:', err);
       }
     }
 
-    /**
-     * Central persistence hook called whenever shoppingItems change
-     */
     function persistShoppingItems(syncShared = true, syncPrivate = true) {
       db.set('shoppingItems', state.shoppingItems);
       updateAllBadges();
@@ -1865,108 +1971,81 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     function updateCloudSyncUI() {
       const dot = document.getElementById('cloud-sync-dot');
-      const dotWrapper = document.getElementById('cloud-sync-dot-wrapper');
       const label = document.getElementById('cloud-sync-label');
       const modalDot = document.getElementById('modal-sync-indicator');
-
-      // Remove any existing ping ring
-      const existingPing = dotWrapper?.querySelector('.animate-ping');
-      if (existingPing) existingPing.remove();
-
-      if (cloud.status === 'synced' && cloud.user) {
-        const ping = document.createElement('span');
-        ping.className = `animate-ping absolute inline-flex h-full w-full rounded-full ${cloud.householdCode ? 'bg-indigo-400' : 'bg-emerald-400'} opacity-75`;
-        dotWrapper?.prepend(ping);
-
-        if (dot) dot.className = `relative inline-flex rounded-full h-2 w-2 ${cloud.householdCode ? 'bg-indigo-500' : 'bg-emerald-500'}`;
-        if (modalDot) modalDot.className = `w-2.5 h-2.5 rounded-full ${cloud.householdCode ? 'bg-indigo-500' : 'bg-emerald-500'}`;
-        if (label) {
-          label.textContent = cloud.householdCode ? `Live Sync • ${cloud.householdCode}` : 'Signed In • Personal';
-        }
-      } else if (cloud.status === 'connecting') {
-        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-400 animate-pulse';
-        if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
-        if (label) label.textContent = 'Syncing...';
-      } else if (cloud.status === 'error') {
-        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-rose-500';
-        if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
-        if (label) label.textContent = 'Sync Error';
-      } else {
-        if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-slate-400';
-        if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400';
-        if (label) label.textContent = cloud.config ? 'Sign In to Sync' : 'Local Only';
-      }
-
-      // Update Cloud Sync Modal internals
-      const configStatusText = document.getElementById('fb-config-status-text');
-      const configEditorBox = document.getElementById('fb-config-editor-box');
-      const clearConfigBtn = document.getElementById('btn-clear-fb-config');
+      const cfgStatus = document.getElementById('fb-config-status-text');
+      const clearCfgBtn = document.getElementById('btn-clear-fb-config');
       const authSection = document.getElementById('fb-auth-section');
       const authHint = document.getElementById('fb-auth-hint');
-      const signedOutControls = document.getElementById('fb-signed-out-controls');
+      const signedOutBox = document.getElementById('fb-signed-out-controls');
       const signedInCard = document.getElementById('fb-signed-in-card');
-      const householdSection = document.getElementById('fb-household-section');
-      const householdInput = document.getElementById('household-code-input');
-      const activeHouseholdStatus = document.getElementById('active-household-status');
-      const activeHouseholdStatusText = document.getElementById('active-household-status-text');
+      const hhSection = document.getElementById('fb-household-section');
+      const hhStatus = document.getElementById('active-household-status');
+      const hhStatusText = document.getElementById('active-household-status-text');
 
-      if (!configStatusText) return;
+      const hasConfig = Boolean(cloud.config && cloud.config.projectId);
+      const hasOverride = Boolean(localStorage.getItem(FB_CONFIG_STORAGE_KEY));
 
-      if (cloud.config) {
-        configStatusText.textContent = `Connected (${cloud.config.projectId})`;
-        configStatusText.className = 'font-bold text-emerald-600 dark:text-emerald-400';
-        if (cloud.configSource === 'localStorage') {
-          clearConfigBtn?.classList.remove('hidden');
-        } else {
-          clearConfigBtn?.classList.add('hidden');
-        }
-        // Enable Step 2 (Auth)
+      if (cfgStatus) {
+        cfgStatus.textContent = hasConfig ? `Connected (${cloud.config.projectId})` : 'Not Configured';
+      }
+      if (clearCfgBtn) {
+        clearCfgBtn.classList.toggle('hidden', !hasOverride);
+      }
+
+      if (hasConfig) {
         authSection?.classList.remove('opacity-60', 'pointer-events-none');
       } else {
-        configStatusText.textContent = 'Not Configured';
-        configStatusText.className = 'font-bold text-amber-600 dark:text-amber-400';
-        configEditorBox?.classList.remove('hidden');
-        clearConfigBtn?.classList.add('hidden');
         authSection?.classList.add('opacity-60', 'pointer-events-none');
       }
 
       if (cloud.user) {
-        if (authHint) authHint.textContent = 'Authenticated';
-        signedOutControls?.classList.add('hidden');
+        signedOutBox?.classList.add('hidden');
         signedInCard?.classList.remove('hidden');
+        hhSection?.classList.remove('opacity-60', 'pointer-events-none');
 
-        const providerId = cloud.user.providerData?.[0]?.providerId || (cloud.user.isAnonymous ? 'anonymous' : 'firebase');
-        const providerLabel = providerId.includes('github')
-          ? 'GitHub'
-          : providerId.includes('google')
-            ? 'Google'
-            : 'Guest (Anonymous)';
+        const providerId = cloud.user.isAnonymous
+          ? 'Guest'
+          : (cloud.user.providerData?.[0]?.providerId || 'Account').replace('.com', '');
+        const displayName = cloud.user.displayName || cloud.user.email || (cloud.user.isAnonymous ? 'Guest Housemate' : 'Signed-In User');
 
-        document.getElementById('fb-user-display-name').textContent =
-          cloud.user.displayName || cloud.user.email || 'Guest Device';
-        document.getElementById('fb-user-provider-badge').textContent = providerLabel;
-        document.getElementById('fb-user-uid').textContent = `${cloud.user.uid.slice(0, 10)}...`;
+        const nameEl = document.getElementById('fb-user-display-name');
+        const badgeEl = document.getElementById('fb-user-provider-badge');
+        const uidEl = document.getElementById('fb-user-uid');
+        if (nameEl) nameEl.textContent = displayName;
+        if (badgeEl) badgeEl.textContent = providerId.toUpperCase();
+        if (uidEl) uidEl.textContent = `${cloud.user.uid.slice(0, 8)}…`;
+        if (authHint) authHint.textContent = 'Connected';
 
-        // Enable Step 3 (Household Room)
-        householdSection?.classList.remove('opacity-60', 'pointer-events-none');
-      } else {
-        if (authHint) authHint.textContent = cloud.config ? 'Choose a sign-in method' : 'Connect Firebase above first';
-        signedOutControls?.classList.remove('hidden');
-        signedInCard?.classList.add('hidden');
-        householdSection?.classList.add('opacity-60', 'pointer-events-none');
-      }
-
-      if (householdInput && document.activeElement !== householdInput) {
-        householdInput.value = cloud.householdCode || '';
-      }
-
-      if (cloud.user && cloud.householdCode) {
-        activeHouseholdStatus?.classList.remove('hidden');
-        if (activeHouseholdStatusText) {
-          activeHouseholdStatusText.textContent = `Live syncing "Shared Household" list in room: ${cloud.householdCode}`;
+        if (cloud.householdCode) {
+          if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-emerald-500';
+          if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+          if (label) label.textContent = `Live • ${cloud.householdCode}`;
+          hhStatus?.classList.remove('hidden');
+          if (hhStatusText) hhStatusText.textContent = `Syncing Shared Household room "${cloud.householdCode}" live`;
+        } else {
+          if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-indigo-500';
+          if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-indigo-500';
+          if (label) label.textContent = 'Personal Synced';
+          hhStatus?.classList.add('hidden');
         }
       } else {
-        activeHouseholdStatus?.classList.add('hidden');
+        signedOutBox?.classList.remove('hidden');
+        signedInCard?.classList.add('hidden');
+        hhSection?.classList.add('opacity-60', 'pointer-events-none');
+        hhStatus?.classList.add('hidden');
+
+        if (hasConfig) {
+          if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-amber-500';
+          if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+          if (label) label.textContent = 'Sign In to Sync';
+          if (authHint) authHint.textContent = 'Choose a sign-in method';
+        } else {
+          if (dot) dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-slate-400';
+          if (modalDot) modalDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400';
+          if (label) label.textContent = 'Local Only';
+          if (authHint) authHint.textContent = 'Connect Firebase above first';
+        }
       }
     }
 
@@ -1982,6 +2061,7 @@ const DEFAULT_FIREBASE_CONFIG = {
         configEditorBox?.classList.remove('hidden');
       }
       updateCloudSyncUI();
+      updateInstallUI();
       openModal('sync-modal');
     }
 
@@ -2014,7 +2094,7 @@ const DEFAULT_FIREBASE_CONFIG = {
       } catch (_) {}
       cloud.user = null;
       await initFirebaseEngine();
-      showToast('Disconnected local Firebase config');
+      showToast('Reverted to built-in Firebase config');
     }
 
     function handleFirebaseAuthError(err) {
@@ -2125,46 +2205,7 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 5. INITIALIZATION
-     * =========================================================================
-     */
-    function initApp() {
-      initThemeSystem();
-      db.runMigrationIfNeeded();
-
-      state.lists = db.get('lists', CORE_LISTS);
-      state.shoppingItems = db.get('shoppingItems', SEED_SHOPPING_ITEMS).map(i => ({
-        ...i,
-        aisle: normalizeAisle(i.aisle, i.name)
-      }));
-      state.recipes = db.get('recipes', SEED_RECIPES).map(r => ({
-        ...r,
-        ingredients: (r.ingredients || []).map(ing => ({
-          ...ing,
-          aisle: normalizeAisle(ing.aisle, ing.name)
-        }))
-      }));
-      state.pantry = db.get('pantry', SEED_PANTRY);
-      state.mealPlan = db.get('mealPlan', {});
-      DAYS_OF_WEEK.forEach(d => {
-        if (!Array.isArray(state.mealPlan[d])) state.mealPlan[d] = [];
-      });
-
-      document.addEventListener('click', (e) => {
-        if (state.openMoveMenuItemId && !e.target.closest('.move-popover-wrapper')) {
-          state.openMoveMenuItemId = null;
-          renderGroceryView();
-        }
-      });
-
-      updateAllBadges();
-      switchTab('grocery');
-      initFirebaseEngine();
-    }
-
-    /**
-     * =========================================================================
-     * 6. NAVIGATION, MODALS & FORMATTING HELPERS
+     * 5. NAVIGATION, MODALS & FORMATTING HELPERS
      * =========================================================================
      */
     function switchTab(tab) {
@@ -2174,27 +2215,20 @@ const DEFAULT_FIREBASE_CONFIG = {
         if (section) section.classList.toggle('hidden', t !== tab);
       });
 
-      document.querySelectorAll('.nav-tab-desktop').forEach(btn => {
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
         const isActive = btn.dataset.tab === tab;
         if (isActive) {
           btn.style.backgroundColor = 'var(--bg-surface)';
           btn.style.color = 'var(--text-primary)';
           btn.style.boxShadow = 'var(--shadow-card)';
+          btn.classList.add('border-emerald-500/40');
+          btn.classList.remove('border-transparent');
         } else {
           btn.style.backgroundColor = 'transparent';
           btn.style.color = 'var(--text-muted)';
           btn.style.boxShadow = 'none';
-        }
-      });
-
-      document.querySelectorAll('.nav-tab-mobile').forEach(btn => {
-        const isActive = btn.dataset.tab === tab;
-        if (isActive) {
-          btn.style.color = 'var(--accent-primary)';
-          btn.classList.add('bg-emerald-500/10', 'font-bold');
-        } else {
-          btn.style.color = 'var(--text-muted)';
-          btn.classList.remove('bg-emerald-500/10', 'font-bold');
+          btn.classList.remove('border-emerald-500/40');
+          btn.classList.add('border-transparent');
         }
       });
 
@@ -2206,24 +2240,29 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     function updateAllBadges() {
       const unboughtCount = state.shoppingItems.filter(i => !i.checked).length;
-      document.getElementById('badge-grocery-desktop').textContent = unboughtCount;
-      document.getElementById('badge-grocery-mobile').textContent = unboughtCount;
-      document.getElementById('badge-recipes-desktop').textContent = state.recipes.length;
-      document.getElementById('badge-pantry-desktop').textContent = state.pantry.length;
+      const badgeGrocery = document.getElementById('badge-grocery');
+      const badgeRecipes = document.getElementById('badge-recipes');
+      const badgePantry = document.getElementById('badge-pantry');
+      if (badgeGrocery) badgeGrocery.textContent = unboughtCount;
+      if (badgeRecipes) badgeRecipes.textContent = state.recipes.length;
+      if (badgePantry) badgePantry.textContent = state.pantry.length;
     }
 
     function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
       document.body.classList.add('overflow-hidden');
     }
 
     function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
       document.body.classList.remove('overflow-hidden');
     }
 
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
+      if (!container) return;
       const toast = document.createElement('div');
       toast.style.backgroundColor = 'var(--bg-surface)';
       toast.style.color = 'var(--text-primary)';
@@ -2310,11 +2349,11 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 7. SMART INGREDIENT PARSER, UK AISLE DETECTOR & MERGING ENGINE
+     * 6. SMART INGREDIENT PARSER, UK AISLE DETECTOR & MERGING ENGINE
      * =========================================================================
      */
     function detectAisle(name) {
-      const n = name.toLowerCase();
+      const n = String(name || '').toLowerCase();
       if (/(onion|garlic|pepper|tomato(?!es)|broccoli|carrot|courgette|lime|lemon|spinach|potato|mushroom|banana|apple|basil|coriander|chilli(?! sauce)|salad|avocado)/.test(n)) return 'Produce';
       if (/(chicken|beef|pork|sausage|salmon|cod|prawn|bacon|mince|turkey|lamb|steak|fish)/.test(n)) return 'Meat & Fish';
       if (/(milk|cheese|cream|butter|yogurt|yoghurt|parmesan|cheddar|egg|eggs|ready meal)/.test(n)) return 'Dairy & Chilled';
@@ -2405,7 +2444,7 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 8. MULTI-GROCERY LISTS VIEW & CROSS-LIST ACTIONS
+     * 7. MULTI-GROCERY LISTS VIEW & CROSS-LIST ACTIONS
      * =========================================================================
      */
     function setActiveList(listId) {
@@ -2421,11 +2460,13 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     function renderGroceryView() {
       const subtitleEl = document.getElementById('active-list-subtitle');
-      if (state.activeListId === 'all') {
-        subtitleEl.textContent = 'Unified supermarket mode — items across all lists with checkout badges';
-      } else {
-        const currentList = state.lists.find(l => l.id === state.activeListId) || state.lists[0];
-        subtitleEl.textContent = currentList.description || `${currentList.name} grocery items`;
+      if (subtitleEl) {
+        if (state.activeListId === 'all') {
+          subtitleEl.textContent = 'Unified supermarket mode — items across all lists with checkout badges';
+        } else {
+          const currentList = state.lists.find(l => l.id === state.activeListId) || state.lists[0];
+          subtitleEl.textContent = currentList.description || `${currentList.name} grocery items`;
+        }
       }
 
       const btnAisle = document.getElementById('btn-view-aisle');
@@ -2434,6 +2475,7 @@ const DEFAULT_FIREBASE_CONFIG = {
         { el: btnAisle, active: state.groceryViewMode === 'aisle' },
         { el: btnFlat, active: state.groceryViewMode === 'flat' }
       ].forEach(({ el, active }) => {
+        if (!el) return;
         if (active) {
           el.style.backgroundColor = 'var(--bg-surface)';
           el.style.color = 'var(--text-primary)';
@@ -2484,36 +2526,40 @@ const DEFAULT_FIREBASE_CONFIG = {
       }).join('');
 
       const allListsActive = state.activeListId === 'all';
-      switcherBar.innerHTML = `
-        ${listPillsHTML}
-        <button
-          onclick="setActiveList('all')"
-          style="${allListsActive ? '' : 'background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);'}"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-2 shrink-0 ${
-            allListsActive ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-900 dark:border-white shadow-md' : 'hover:border-emerald-500/40'
-          }"
-        >
-          <span>All Lists</span>
-          <span
-            style="${allListsActive ? '' : 'background-color: var(--bg-surface-elevated); color: var(--text-primary);'}"
-            class="px-1.5 py-0.2 rounded-md text-[11px] font-extrabold ${allListsActive ? 'bg-white/20 dark:bg-black/15' : ''}"
-          >${totalUnbought}</span>
-        </button>
+      if (switcherBar) {
+        switcherBar.innerHTML = `
+          ${listPillsHTML}
+          <button
+            onclick="setActiveList('all')"
+            style="${allListsActive ? '' : 'background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);'}"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-2 shrink-0 ${
+              allListsActive ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-900 dark:border-white shadow-md' : 'hover:border-emerald-500/40'
+            }"
+          >
+            <span>All Lists</span>
+            <span
+              style="${allListsActive ? '' : 'background-color: var(--bg-surface-elevated); color: var(--text-primary);'}"
+              class="px-1.5 py-0.2 rounded-md text-[11px] font-extrabold ${allListsActive ? 'bg-white/20 dark:bg-black/15' : ''}"
+            >${totalUnbought}</span>
+          </button>
 
-        <button
-          onclick="openModal('new-list-modal')"
-          style="border-color: var(--border-strong); color: var(--text-muted);"
-          class="px-3 py-2 rounded-xl text-xs font-bold border border-dashed hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition shrink-0"
-        >
-          + New List
-        </button>
-      `;
+          <button
+            onclick="openModal('new-list-modal')"
+            style="border-color: var(--border-strong); color: var(--text-muted);"
+            class="px-3 py-2 rounded-xl text-xs font-bold border border-dashed hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition shrink-0"
+          >
+            + New List
+          </button>
+        `;
+      }
 
       const quickListSelect = document.getElementById('quick-add-list');
-      const defaultTarget = state.activeListId === 'all' ? 'personal' : state.activeListId;
-      quickListSelect.innerHTML = state.lists.map(l => `
-        <option value="${l.id}" ${l.id === defaultTarget ? 'selected' : ''}>To: ${escapeHTML(l.name)}</option>
-      `).join('');
+      if (quickListSelect) {
+        const defaultTarget = state.activeListId === 'all' ? 'personal' : state.activeListId;
+        quickListSelect.innerHTML = state.lists.map(l => `
+          <option value="${l.id}" ${l.id === defaultTarget ? 'selected' : ''}>To: ${escapeHTML(l.name)}</option>
+        `).join('');
+      }
 
       const scopedItems = state.activeListId === 'all'
         ? state.shoppingItems
@@ -2524,6 +2570,7 @@ const DEFAULT_FIREBASE_CONFIG = {
 
       const itemsContainer = document.getElementById('grocery-items-container');
       const checkedContainer = document.getElementById('grocery-checked-container');
+      if (!itemsContainer || !checkedContainer) return;
 
       if (unboughtItems.length === 0 && checkedItems.length === 0) {
         itemsContainer.innerHTML = `
@@ -2787,7 +2834,6 @@ const DEFAULT_FIREBASE_CONFIG = {
         }
       }
 
-      // Sync both source and destination buckets if either was 'shared'
       const touchesShared = sourceListId === 'shared' || targetListId === 'shared';
       const touchesPrivate = sourceListId !== 'shared' || targetListId !== 'shared';
       persistShoppingItems(touchesShared, touchesPrivate);
@@ -2809,11 +2855,9 @@ const DEFAULT_FIREBASE_CONFIG = {
       if (checkedInScope.length === 0) return;
 
       let touchesShared = false;
-      let touchesPrivate = false;
 
       checkedInScope.forEach(item => {
         if (item.listId === 'shared') touchesShared = true;
-        else touchesPrivate = true;
 
         const exists = state.pantry.some(p => p.toLowerCase() === item.name.trim().toLowerCase());
         if (!exists) {
@@ -2938,7 +2982,7 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 9. PANTRY INVENTORY & MATCHING HELPERS
+     * 8. PANTRY INVENTORY & MATCHING HELPERS
      * =========================================================================
      */
     function isIngredientInPantry(ingName) {
@@ -2971,6 +3015,7 @@ const DEFAULT_FIREBASE_CONFIG = {
         .sort((a, b) => a.localeCompare(b));
 
       const grid = document.getElementById('pantry-grid');
+      if (!grid) return;
       if (sorted.length === 0) {
         grid.innerHTML = `
           <div style="background-color: var(--bg-surface); border-color: var(--border-strong); color: var(--text-muted);" class="col-span-full rounded-2xl border border-dashed p-10 text-center text-xs">
@@ -3025,7 +3070,7 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 10. RECIPES VIEW, RECIPE DETAIL & PER-INGREDIENT LIST ROUTING
+     * 9. RECIPES VIEW, RECIPE DETAIL & PER-INGREDIENT LIST ROUTING
      * =========================================================================
      */
     function renderRecipes() {
@@ -3033,20 +3078,23 @@ const DEFAULT_FIREBASE_CONFIG = {
 
       const tagSet = new Set(['All']);
       state.recipes.forEach(r => (r.tags || []).forEach(t => tagSet.add(t)));
-      document.getElementById('recipe-tags-bar').innerHTML = Array.from(tagSet).map(tag => {
-        const active = state.selectedRecipeTag === tag;
-        return `
-          <button
-            onclick="setRecipeTagFilter('${escapeHTML(tag)}')"
-            style="${active ? '' : 'background-color: var(--bg-surface-elevated); border-color: var(--border-subtle); color: var(--text-secondary);'}"
-            class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition ${
-              active ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 border-emerald-500' : 'hover:border-emerald-500/40'
-            }"
-          >
-            ${escapeHTML(tag)}
-          </button>
-        `;
-      }).join('');
+      const tagsBar = document.getElementById('recipe-tags-bar');
+      if (tagsBar) {
+        tagsBar.innerHTML = Array.from(tagSet).map(tag => {
+          const active = state.selectedRecipeTag === tag;
+          return `
+            <button
+              onclick="setRecipeTagFilter('${escapeHTML(tag)}')"
+              style="${active ? '' : 'background-color: var(--bg-surface-elevated); border-color: var(--border-subtle); color: var(--text-secondary);'}"
+              class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap border transition ${
+                active ? 'bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 border-emerald-500' : 'hover:border-emerald-500/40'
+              }"
+            >
+              ${escapeHTML(tag)}
+            </button>
+          `;
+        }).join('');
+      }
 
       const filtered = state.recipes.filter(r => {
         const tagOk = state.selectedRecipeTag === 'All' || (r.tags || []).includes(state.selectedRecipeTag);
@@ -3060,6 +3108,7 @@ const DEFAULT_FIREBASE_CONFIG = {
       });
 
       const grid = document.getElementById('recipes-grid');
+      if (!grid) return;
       if (filtered.length === 0) {
         grid.innerHTML = `
           <div style="background-color: var(--bg-surface); border-color: var(--border-strong);" class="col-span-full rounded-2xl border border-dashed p-10 text-center space-y-1">
@@ -3175,6 +3224,7 @@ const DEFAULT_FIREBASE_CONFIG = {
       const scaledServings = formatNumber(recipe.servings * mult);
 
       const container = document.getElementById('recipe-detail-content');
+      if (!container) return;
       container.innerHTML = `
         <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="px-6 py-5 border-b flex items-start justify-between gap-4">
           <div class="space-y-1.5">
@@ -3354,7 +3404,7 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 11. ADD / EDIT RECIPE MODAL & QUICK-PASTE PARSER
+     * 10. ADD / EDIT RECIPE MODAL & QUICK-PASTE PARSER
      * =========================================================================
      */
     function openRecipeFormModal(recipeId = null) {
@@ -3499,13 +3549,14 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 12. WEEKLY MEAL PLANNER (PERSONAL VS SHARED SCOPE + SMART ROUTE)
+     * 11. WEEKLY MEAL PLANNER (PERSONAL VS SHARED SCOPE + SMART ROUTE)
      * =========================================================================
      */
     let activeMealSlotMode = 'recipe';
 
     function renderMealPlanner() {
       const grid = document.getElementById('meal-plan-grid');
+      if (!grid) return;
       grid.innerHTML = DAYS_OF_WEEK.map(day => {
         const meals = state.mealPlan[day] || [];
 
@@ -3835,7 +3886,7 @@ const DEFAULT_FIREBASE_CONFIG = {
 
     /**
      * =========================================================================
-     * 13. BACKUP / EXPORT / CLIPBOARD HELPERS & GLOBAL EXPORTS
+     * 12. BACKUP / EXPORT / CLIPBOARD HELPERS
      * =========================================================================
      */
     function exportBackupJSON() {
@@ -3898,10 +3949,15 @@ const DEFAULT_FIREBASE_CONFIG = {
       document.body.removeChild(textarea);
     }
 
-    // Expose all inline HTML event handlers onto window (required for ES modules)
+    /**
+     * =========================================================================
+     * 13. GLOBAL HANDLER REGISTRATION & APP BOOTSTRAP
+     * =========================================================================
+     */
     Object.assign(window, {
       switchTab,
       setThemeMode,
+      handleInstallButtonClick,
       openModal,
       closeModal,
       openCloudSyncModal,
@@ -3959,6 +4015,41 @@ const DEFAULT_FIREBASE_CONFIG = {
       exportBackupJSON,
       importBackupJSON
     });
+
+    function initApp() {
+      initThemeSystem();
+      initPWAInstallability();
+      db.runMigrationIfNeeded();
+
+      state.lists = db.get('lists', CORE_LISTS);
+      state.shoppingItems = db.get('shoppingItems', SEED_SHOPPING_ITEMS).map(i => ({
+        ...i,
+        aisle: normalizeAisle(i.aisle, i.name)
+      }));
+      state.recipes = db.get('recipes', SEED_RECIPES).map(r => ({
+        ...r,
+        ingredients: (r.ingredients || []).map(ing => ({
+          ...ing,
+          aisle: normalizeAisle(ing.aisle, ing.name)
+        }))
+      }));
+      state.pantry = db.get('pantry', SEED_PANTRY);
+      state.mealPlan = db.get('mealPlan', {});
+      DAYS_OF_WEEK.forEach(d => {
+        if (!Array.isArray(state.mealPlan[d])) state.mealPlan[d] = [];
+      });
+
+      document.addEventListener('click', (e) => {
+        if (state.openMoveMenuItemId && !e.target.closest('.move-popover-wrapper')) {
+          state.openMoveMenuItemId = null;
+          renderGroceryView();
+        }
+      });
+
+      updateAllBadges();
+      switchTab('grocery');
+      initFirebaseEngine();
+    }
 
     if (document.readyState === 'loading') {
       window.addEventListener('DOMContentLoaded', initApp);
