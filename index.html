@@ -102,6 +102,50 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    /* Reading / Shop Mode: hide chrome & maximize on-screen grocery density */
+    body.reading-mode header,
+    body.reading-mode #grocery-header-bar,
+    body.reading-mode #list-switcher-bar,
+    body.reading-mode #grocery-controls-bar,
+    body.reading-mode #quick-add-grocery-form {
+      display: none !important;
+    }
+
+    body.reading-mode main {
+      padding-top: 0.5rem !important;
+      padding-bottom: 2rem !important;
+    }
+
+    body.reading-mode #tab-grocery {
+      gap: 0.625rem !important;
+    }
+
+    body.reading-mode #reading-mode-banner {
+      display: flex !important;
+    }
+
+    body.reading-mode #grocery-items-container {
+      gap: 0.5rem !important;
+    }
+
+    body.reading-mode .grocery-aisle-header {
+      padding-top: 0.375rem !important;
+      padding-bottom: 0.375rem !important;
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+
+    body.reading-mode .grocery-item-row {
+      padding-top: 0.45rem !important;
+      padding-bottom: 0.45rem !important;
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+
+    body.reading-mode .grocery-row-actions {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-emerald-500/25 selection:text-emerald-700 dark:selection:text-emerald-200">
@@ -274,8 +318,40 @@
     <!-- TAB 1: GROCERY LISTS                                                -->
     <!-- =================================================================== -->
     <section id="tab-grocery" class="space-y-4">
+      <!-- Sticky Compact Reading Mode Banner (Hidden unless Reading Mode is active) -->
+      <div
+        id="reading-mode-banner"
+        class="hidden sticky top-2 z-30 items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg"
+      >
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span id="reading-mode-title" class="text-sm font-extrabold truncate">Grocery List</span>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-extrabold uppercase tracking-wider bg-black/15">Reading Mode</span>
+          </div>
+          <div id="reading-mode-count" class="text-[11px] font-semibold opacity-90">0 items remaining</div>
+        </div>
+
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            id="btn-reading-wakelock"
+            class="px-2.5 py-1.5 rounded-xl bg-black/15 hover:bg-black/25 text-[11px] font-bold transition"
+            title="Keep screen awake while shopping"
+          >
+            Screen: Auto
+          </button>
+          <button
+            type="button"
+            id="btn-exit-reading-mode"
+            class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-950 text-emerald-700 dark:text-emerald-300 text-xs font-extrabold shadow-sm transition"
+          >
+            Exit
+          </button>
+        </div>
+      </div>
+
       <!-- 1. Heading & Quick List Actions -->
-      <div class="flex flex-wrap items-start justify-between gap-3">
+      <div id="grocery-header-bar" class="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 style="color: var(--text-primary);" class="text-2xl font-extrabold tracking-tight">Grocery Lists</h1>
           <p id="active-list-subtitle" style="color: var(--text-muted);" class="text-sm">
@@ -308,8 +384,8 @@
         <!-- Populated dynamically -->
       </div>
 
-      <!-- 3. View & Share Controls (By Aisle | Flat List, Hide Checked, Copy) -->
-      <div class="flex flex-wrap items-center justify-between gap-2">
+      <!-- 3. View & Share Controls (By Aisle | Flat List, Hide Checked, Copy, Reading) -->
+      <div id="grocery-controls-bar" class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex flex-wrap items-center gap-2">
           <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="inline-flex p-1 rounded-xl border">
             <button type="button" id="btn-view-aisle" class="px-3 py-1.5 rounded-lg text-xs font-bold transition">
@@ -331,17 +407,32 @@
           </button>
         </div>
 
-        <button
-          type="button"
-          id="btn-copy-grocery"
-          style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);"
-          class="px-3.5 py-2 rounded-xl border hover:border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition"
-        >
-          <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-          </svg>
-          <span>Copy</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="btn-copy-grocery"
+            style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);"
+            class="px-3.5 py-2 rounded-xl border hover:border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition"
+          >
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            <span>Copy</span>
+          </button>
+
+          <button
+            type="button"
+            id="btn-reading-mode"
+            style="background-color: var(--bg-surface); border-color: var(--border-subtle); color: var(--text-secondary); box-shadow: var(--shadow-card);"
+            class="px-3.5 py-2 rounded-xl border hover:border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition"
+            title="Compact shopping list view"
+          >
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10M4 18h10" />
+            </svg>
+            <span>Reading</span>
+          </button>
+        </div>
       </div>
 
       <!-- 4. Add Grocery Item Form -->
@@ -998,7 +1089,7 @@
         <!-- Subtle Version Footer -->
         <div style="border-color: var(--border-subtle); color: var(--text-muted);" class="pt-2.5 border-t flex items-center justify-between text-[11px]">
           <span>KitchenSync</span>
-          <span id="app-version-label" class="font-mono font-semibold opacity-80">v1.1.7</span>
+          <span id="app-version-label" class="font-mono font-semibold opacity-80">v1.2</span>
         </div>
       </div>
     </div>
@@ -1027,9 +1118,9 @@
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
     /* =========================================================================
-     * 1. CONSTANTS, VERSION & PRE-CONFIGURED FIREBASE CREDENTIALS
-     * ========================================================================= */
-    const APP_VERSION = 'v1.1.8';
+- 1. CONSTANTS, VERSION & PRE-CONFIGURED FIREBASE CREDENTIALS
+- ========================================================================= */
+    const APP_VERSION = 'v1.2';
     const STATE_STORAGE_KEY = 'kitchensync_state_v1';
     const THEME_STORAGE_KEY = 'kitchensync_theme';
     const HOUSEHOLD_STORAGE_KEY = 'kitchensync_household_code';
@@ -1113,8 +1204,8 @@
     };
 
     /* =========================================================================
-     * 2. SEED DATASETS (6 FULL RECIPES, GROCERY LISTS, PANTRY & PLANNER)
-     * ========================================================================= */
+- 2. SEED DATASETS (6 FULL RECIPES, GROCERY LISTS, PANTRY & PLANNER)
+- ========================================================================= */
     function createDefaultState() {
       const currentWeekKey = getWeekKeyForOffset(0);
       return {
@@ -1380,8 +1471,8 @@
     }
 
     /* =========================================================================
-     * 3. RUNTIME STATE & STORAGE ENGINE
-     * ========================================================================= */
+- 3. RUNTIME STATE & STORAGE ENGINE
+- ========================================================================= */
     let appState = createDefaultState();
     let uiState = {
       selectedRecipeTag: 'All',
@@ -1391,7 +1482,9 @@
       detailCheckedSteps: {},
       weekOffset: 0,
       selectedPantryCategory: 'All',
-      deferredInstallPrompt: null
+      deferredInstallPrompt: null,
+      readingMode: false,
+      readingWakeLock: null
     };
 
     // Firebase runtime handles
@@ -1488,8 +1581,8 @@
     }
 
     /* =========================================================================
-     * 4. TOAST NOTIFICATIONS & MODAL CONTROLLERS
-     * ========================================================================= */
+- 4. TOAST NOTIFICATIONS & MODAL CONTROLLERS
+- ========================================================================= */
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       if (!container) return;
@@ -1527,8 +1620,8 @@
     }
 
     /* =========================================================================
-     * 5. THEME ENGINE & PWA INSTALL / PNG ICON GENERATOR
-     * ========================================================================= */
+- 5. THEME ENGINE & PWA INSTALL / PNG ICON GENERATOR
+- ========================================================================= */
     function applyTheme(mode) {
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       const isDark = mode === 'dark' || (mode === 'system' && prefersDark);
@@ -1696,8 +1789,8 @@
     }
 
     /* =========================================================================
-     * 6. AISLE INFERENCE, PANTRY MATCHING & GROCERY HELPERS
-     * ========================================================================= */
+- 6. AISLE INFERENCE, PANTRY MATCHING & GROCERY HELPERS
+- ========================================================================= */
     function inferAisle(name) {
       const lower = String(name || '').toLowerCase();
       if (/(onion|garlic|pepper|broccoli|spinach|tomato(?!es)|lime|lemon|apple|banana|carrot|potato|coriander|basil|herb|lettuce|avocado|mushroom|ginger|chili|chilli|cucumber)/.test(lower)) {
@@ -1775,10 +1868,14 @@
     }
 
     /* =========================================================================
-     * 7. NAVIGATION & LIVE BADGES
-     * ========================================================================= */
+- 7. NAVIGATION, READING MODE & LIVE BADGES
+- ========================================================================= */
     function switchTab(tabName) {
       appState.activeTab = tabName;
+      if (tabName !== 'grocery' && uiState.readingMode) {
+        setReadingMode(false);
+      }
+
       ['grocery', 'recipes', 'planner', 'pantry'].forEach(t => {
         const sec = document.getElementById(`tab-${t}`);
         if (sec) sec.classList.toggle('hidden', t !== tabName);
@@ -1800,6 +1897,69 @@
       });
 
       renderAll();
+    }
+
+    function setReadingMode(enable) {
+      uiState.readingMode = Boolean(enable);
+      document.body.classList.toggle('reading-mode', uiState.readingMode);
+
+      if (uiState.readingMode) {
+        if (appState.activeTab !== 'grocery') {
+          switchTab('grocery');
+        } else {
+          updateReadingModeBanner();
+        }
+      } else if (uiState.readingWakeLock) {
+        uiState.readingWakeLock.release().catch(() => {});
+        uiState.readingWakeLock = null;
+        const wlBtn = document.getElementById('btn-reading-wakelock');
+        if (wlBtn) wlBtn.textContent = 'Screen: Auto';
+      }
+    }
+
+    function updateReadingModeBanner() {
+      const titleEl = document.getElementById('reading-mode-title');
+      const countEl = document.getElementById('reading-mode-count');
+      if (!titleEl || !countEl) return;
+
+      const listName = appState.activeListId === 'ALL'
+        ? 'All Lists'
+        : (appState.lists.find(l => l.id === appState.activeListId)?.name || 'Grocery List');
+
+      const remaining = (appState.activeListId === 'ALL'
+        ? appState.groceryItems
+        : appState.groceryItems.filter(i => i.listId === appState.activeListId)
+      ).filter(i => !i.checked).length;
+
+      titleEl.textContent = listName;
+      countEl.textContent = `${remaining} item${remaining === 1 ? '' : 's'} remaining • Tap to check off`;
+    }
+
+    async function toggleReadingWakeLock() {
+      const btn = document.getElementById('btn-reading-wakelock');
+      if (!('wakeLock' in navigator)) {
+        if (btn) btn.textContent = 'Unsupported';
+        return;
+      }
+
+      if (uiState.readingWakeLock) {
+        try {
+          await uiState.readingWakeLock.release();
+        } catch (e) {}
+        uiState.readingWakeLock = null;
+        if (btn) btn.textContent = 'Screen: Auto';
+      } else {
+        try {
+          uiState.readingWakeLock = await navigator.wakeLock.request('screen');
+          if (btn) btn.textContent = 'Screen: On';
+          uiState.readingWakeLock.addEventListener('release', () => {
+            uiState.readingWakeLock = null;
+            if (btn) btn.textContent = 'Screen: Auto';
+          });
+        } catch (e) {
+          if (btn) btn.textContent = 'Screen: Auto';
+        }
+      }
     }
 
     function updateHeaderBadges() {
@@ -1828,9 +1988,11 @@
     }
 
     /* =========================================================================
-     * 8. TAB 1: GROCERY LISTS RENDERING & INTERACTIONS
-     * ========================================================================= */
+- 8. TAB 1: GROCERY LISTS RENDERING & INTERACTIONS
+- ========================================================================= */
     function renderGroceryTab() {
+      updateReadingModeBanner();
+
       // 1. Update view toggle buttons
       const btnAisle = document.getElementById('btn-view-aisle');
       const btnFlat = document.getElementById('btn-view-flat');
@@ -1975,7 +2137,7 @@
           .filter(aisle => grouped[aisle].length > 0)
           .map(aisle => `
             <div style="background-color: var(--bg-surface); border-color: var(--border-subtle); box-shadow: var(--shadow-card);" class="rounded-2xl border overflow-hidden">
-              <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="px-4 py-2.5 border-b flex items-center justify-between">
+              <div style="background-color: var(--bg-surface-elevated); border-color: var(--border-subtle);" class="grocery-aisle-header px-4 py-2.5 border-b flex items-center justify-between">
                 <span style="color: var(--text-secondary);" class="text-xs font-extrabold uppercase tracking-wider">${escapeHTML(aisle)}</span>
                 <span style="color: var(--text-muted);" class="text-[11px] font-bold">${grouped[aisle].length}</span>
               </div>
@@ -2009,7 +2171,7 @@
       const otherList = appState.lists.find(l => l.id !== item.listId);
 
       return `
-        <div class="px-4 py-3 flex items-center justify-between gap-2.5 transition ${item.checked ? 'opacity-55' : ''}">
+        <div class="grocery-item-row px-4 py-3 flex items-center justify-between gap-2.5 transition ${item.checked ? 'opacity-55' : ''}">
           <label class="flex items-start gap-3 min-w-0 flex-1 cursor-pointer">
             <input
               type="checkbox"
@@ -2039,7 +2201,7 @@
             </div>
           </label>
 
-          <div class="flex items-center gap-1.5 shrink-0">
+          <div class="grocery-row-actions flex items-center gap-1.5 shrink-0">
             ${otherList ? `
               <button
                 type="button"
@@ -2108,8 +2270,8 @@
     }
 
     /* =========================================================================
-     * 9. TAB 2: RECIPES RENDERING, SCALER & EDITOR
-     * ========================================================================= */
+- 9. TAB 2: RECIPES RENDERING, SCALER & EDITOR
+- ========================================================================= */
     function getRecipeMatchInfo(recipe) {
       const total = recipe.ingredients?.length || 0;
       if (!total) return { matched: 0, total: 0, pct: 0 };
@@ -2413,8 +2575,8 @@
     }
 
     /* =========================================================================
-     * 10. TAB 3: MEAL PLANNER RENDERING & INTERACTIONS
-     * ========================================================================= */
+- 10. TAB 3: MEAL PLANNER RENDERING & INTERACTIONS
+- ========================================================================= */
     function renderPlannerTab() {
       const weekKey = getWeekKeyForOffset(uiState.weekOffset);
       const weekPlan = ensureWeekPlan(weekKey);
@@ -2535,8 +2697,8 @@
     }
 
     /* =========================================================================
-     * 11. TAB 4: PANTRY RENDERING & INTERACTIONS
-     * ========================================================================= */
+- 11. TAB 4: PANTRY RENDERING & INTERACTIONS
+- ========================================================================= */
     function renderPantryTab() {
       // Quick-add chips
       const chipsContainer = document.getElementById('pantry-quick-chips');
@@ -2650,8 +2812,8 @@
     }
 
     /* =========================================================================
-     * 12. FIREBASE AUTHENTICATION & FIRESTORE LIVE SYNC
-     * ========================================================================= */
+- 12. FIREBASE AUTHENTICATION & FIRESTORE LIVE SYNC
+- ========================================================================= */
     function initFirebaseDefensively() {
       try {
         const params = new URLSearchParams(window.location.search);
@@ -2864,8 +3026,8 @@
     }
 
     /* =========================================================================
-     * 13. DELEGATED CLICK & FORM SUBMIT EVENT WIRING (NEVER RELOADS PAGE)
-     * ========================================================================= */
+- 13. DELEGATED CLICK & FORM SUBMIT EVENT WIRING (NEVER RELOADS PAGE)
+- ========================================================================= */
     function bindAllEventListeners() {
       // Global safety net: prevent ANY form from ever triggering a page reload
       document.addEventListener('submit', (e) => {
@@ -3123,6 +3285,20 @@
         const tabName = target.getAttribute('data-tab');
         if (tabName) {
           switchTab(tabName);
+          return;
+        }
+
+        // Reading Mode Controls
+        if (target.id === 'btn-reading-mode') {
+          setReadingMode(true);
+          return;
+        }
+        if (target.id === 'btn-exit-reading-mode') {
+          setReadingMode(false);
+          return;
+        }
+        if (target.id === 'btn-reading-wakelock') {
+          toggleReadingWakeLock();
           return;
         }
 
@@ -3627,13 +3803,19 @@
         }
       });
 
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && uiState.readingMode) {
+          setReadingMode(false);
+        }
+      });
+
       document.getElementById('recipe-search')?.addEventListener('input', () => renderRecipesTab());
       document.getElementById('pantry-search-input')?.addEventListener('input', () => renderPantryTab());
     }
 
     /* =========================================================================
-     * 14. BOOTSTRAP ON STARTUP
-     * ========================================================================= */
+- 14. BOOTSTRAP ON STARTUP
+- ========================================================================= */
     function initKitchenSync() {
       const versionEl = document.getElementById('app-version-label');
       if (versionEl) versionEl.textContent = APP_VERSION;
@@ -3644,6 +3826,12 @@
       bindAllEventListeners();
       switchTab(appState.activeTab || 'grocery');
       initFirebaseDefensively();
+
+      try {
+        if (new URLSearchParams(window.location.search).get('mode') === 'reading') {
+          setReadingMode(true);
+        }
+      } catch (e) {}
     }
 
     if (document.readyState === 'loading') {
